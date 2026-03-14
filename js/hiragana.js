@@ -6,12 +6,42 @@ const Hiragana = {
   // 現在の文字
   current: "あ",
 
-  // 文字データ（将来の拡張用）
+  // 文字データ（あ行・か行）
   characters: {
-    "あ": {
-      char: "あ",
-      strokeCount: 3,
-    },
+    "あ": { char: "あ", strokeCount: 3, row: "あぎょう" },
+    "い": { char: "い", strokeCount: 2, row: "あぎょう" },
+    "う": { char: "う", strokeCount: 2, row: "あぎょう" },
+    "え": { char: "え", strokeCount: 2, row: "あぎょう" },
+    "お": { char: "お", strokeCount: 3, row: "あぎょう" },
+    "か": { char: "か", strokeCount: 3, row: "かぎょう" },
+    "き": { char: "き", strokeCount: 4, row: "かぎょう" },
+    "く": { char: "く", strokeCount: 1, row: "かぎょう" },
+    "け": { char: "け", strokeCount: 3, row: "かぎょう" },
+    "こ": { char: "こ", strokeCount: 2, row: "かぎょう" },
+  },
+
+  // 利用可能な全文字を配列で返す
+  getAllCharacters() {
+    return Object.keys(this.characters);
+  },
+
+  // 行ごとにグループ化して返す
+  getCharactersByRow() {
+    const rows = {};
+    for (const [char, data] of Object.entries(this.characters)) {
+      if (!rows[data.row]) {
+        rows[data.row] = [];
+      }
+      rows[data.row].push(char);
+    }
+    return rows;
+  },
+
+  // 現在の文字を設定
+  setCurrent(char) {
+    if (this.characters[char]) {
+      this.current = char;
+    }
   },
 
   // お手本をキャンバスに描画

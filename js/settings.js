@@ -20,6 +20,9 @@ const Settings = {
   sampleStep: 8,          // サンプリング間隔（px）
   hitRadius: 30,           // 判定の許容半径（px）
 
+  // ごほうび動画までに必要なクリア文字数
+  requiredClears: 3,
+
   // YouTube ごほうび動画ID
-  youtubeVideoId: "dQw4w9WgXcQ",
+  youtubeVideoId: "ptNx7MUtOJQ",
 };
