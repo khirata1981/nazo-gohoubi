@@ -25,10 +25,30 @@ const Hiragana = {
     return Object.keys(this.characters);
   },
 
+  // 有効な行の文字のみ返す
+  getEnabledCharacters() {
+    return Object.entries(this.characters)
+      .filter(([, data]) => Settings.isRowEnabled(data.row))
+      .map(([char]) => char);
+  },
+
   // 行ごとにグループ化して返す
   getCharactersByRow() {
     const rows = {};
     for (const [char, data] of Object.entries(this.characters)) {
+      if (!rows[data.row]) {
+        rows[data.row] = [];
+      }
+      rows[data.row].push(char);
+    }
+    return rows;
+  },
+
+  // 有効な行のみグループ化して返す
+  getEnabledCharactersByRow() {
+    const rows = {};
+    for (const [char, data] of Object.entries(this.characters)) {
+      if (!Settings.isRowEnabled(data.row)) continue;
       if (!rows[data.row]) {
         rows[data.row] = [];
       }

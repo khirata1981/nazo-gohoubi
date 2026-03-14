@@ -27,6 +27,10 @@ const App = {
     document.getElementById("btn-select").addEventListener("click", () => this.showSelectScreen());
     document.getElementById("btn-reward").addEventListener("click", () => this.playReward());
     document.getElementById("btn-close-video").addEventListener("click", () => YouTube.stop());
+    document.getElementById("btn-limit-ok").addEventListener("click", () => this.showSelectScreen());
+
+    // 設定ボタン
+    document.getElementById("btn-settings").addEventListener("click", () => SettingsUI.showPasscode());
 
     // YouTube API 読み込み
     YouTube.loadAPI();
@@ -61,6 +65,7 @@ const App = {
     document.getElementById("tracing-screen").classList.add("hidden");
     document.getElementById("clear-overlay").classList.add("hidden");
     document.getElementById("reward-overlay").classList.add("hidden");
+    document.getElementById("limit-overlay").classList.add("hidden");
 
     this.renderCharGrid();
     this.updateProgress();
@@ -70,7 +75,7 @@ const App = {
     const grid = document.getElementById("char-grid");
     grid.innerHTML = "";
 
-    const rows = Hiragana.getCharactersByRow();
+    const rows = Hiragana.getEnabledCharactersByRow();
 
     for (const [rowName, chars] of Object.entries(rows)) {
       // 行ラベル
@@ -173,7 +178,12 @@ const App = {
 
     // ごほうび条件を満たしたか
     if (this.sessionClears >= Settings.requiredClears) {
-      this.showRewardScreen();
+      // 動画上限チェック
+      if (Settings.canPlayVideo()) {
+        this.showRewardScreen();
+      } else {
+        this.showLimitScreen();
+      }
     } else {
       this.showClearOverlay();
     }
@@ -190,9 +200,16 @@ const App = {
     document.getElementById("reward-overlay").classList.remove("hidden");
   },
 
+  showLimitScreen() {
+    this.screen = "limit";
+    document.getElementById("clear-overlay").classList.add("hidden");
+    document.getElementById("tracing-screen").classList.add("hidden");
+    document.getElementById("limit-overlay").classList.remove("hidden");
+  },
+
   // 次の未クリア文字へ進む
   goNextChar() {
-    const allChars = Hiragana.getAllCharacters();
+    const allChars = Hiragana.getEnabledCharacters();
     const currentIndex = allChars.indexOf(Hiragana.current);
 
     // 現在の文字の次から探す
@@ -210,6 +227,7 @@ const App = {
   },
 
   playReward() {
+    Settings.recordVideoPlay();
     document.getElementById("reward-overlay").classList.add("hidden");
     document.getElementById("tracing-screen").classList.add("hidden");
     YouTube.play("youtube-player");
@@ -219,6 +237,404 @@ const App = {
     // セッションクリア数をリセットして選択画面へ
     this.sessionClears = 0;
     this.showSelectScreen();
+  },
+};
+
+// ========================================
+// 設定UI管理
+// ========================================
+
+const SettingsUI = {
+  passcodeInput: "",
+  testPlayer: null,
+
+  // --- パスコード画面 ---
+  showPasscode() {
+    this.passcodeInput = "";
+    this.updateDots();
+    document.getElementById("passcode-error").textContent = "";
+    document.getElementById("passcode-screen").classList.remove("hidden");
+    this.bindNumpad();
+  },
+
+  hidePasscode() {
+    document.getElementById("passcode-screen").classList.add("hidden");
+    this.unbindNumpad();
+  },
+
+  bindNumpad() {
+    // イベントハンドラを保存して後で解除できるようにする
+    this._numpadHandler = (e) => {
+      const btn = e.target.closest(".numpad-btn");
+      if (!btn) return;
+
+      const num = btn.dataset.num;
+      const action = btn.dataset.action;
+
+      if (num !== undefined) {
+        if (this.passcodeInput.length < 4) {
+          this.passcodeInput += num;
+          this.updateDots();
+
+          if (this.passcodeInput.length === 4) {
+            setTimeout(() => this.verifyPasscode(), 200);
+          }
+        }
+      } else if (action === "delete") {
+        this.passcodeInput = this.passcodeInput.slice(0, -1);
+        this.updateDots();
+      } else if (action === "cancel") {
+        this.hidePasscode();
+      }
+    };
+
+    document.querySelector(".numpad").addEventListener("click", this._numpadHandler);
+  },
+
+  unbindNumpad() {
+    if (this._numpadHandler) {
+      document.querySelector(".numpad").removeEventListener("click", this._numpadHandler);
+      this._numpadHandler = null;
+    }
+  },
+
+  updateDots() {
+    for (let i = 0; i < 4; i++) {
+      const dot = document.getElementById(`dot-${i}`);
+      dot.classList.toggle("filled", i < this.passcodeInput.length);
+    }
+  },
+
+  verifyPasscode() {
+    if (Settings.verifyPasscode(this.passcodeInput)) {
+      this.hidePasscode();
+      this.showSettings();
+    } else {
+      document.getElementById("passcode-error").textContent = "パスコードが違います";
+      this.passcodeInput = "";
+      this.updateDots();
+    }
+  },
+
+  // --- 設定画面 ---
+  showSettings() {
+    this.renderRowCheckboxes();
+    this.renderSelects();
+    this.renderVideoList();
+    this.clearPasscodeChangeForm();
+
+    document.getElementById("settings-screen").classList.remove("hidden");
+    this.bindSettingsEvents();
+  },
+
+  hideSettings() {
+    document.getElementById("settings-screen").classList.add("hidden");
+    this.unbindSettingsEvents();
+  },
+
+  bindSettingsEvents() {
+    this._settingsHandlers = {};
+
+    // 閉じるボタン
+    const closeBtn = document.getElementById("btn-settings-close");
+    this._settingsHandlers.close = () => this.hideSettings();
+    closeBtn.addEventListener("click", this._settingsHandlers.close);
+
+    // 保存ボタン
+    const saveBtn = document.getElementById("btn-save-settings");
+    this._settingsHandlers.save = () => this.saveAndClose();
+    saveBtn.addEventListener("click", this._settingsHandlers.save);
+
+    // 動画追加ボタン
+    const addBtn = document.getElementById("btn-add-video");
+    this._settingsHandlers.addVideo = () => this.addVideo();
+    addBtn.addEventListener("click", this._settingsHandlers.addVideo);
+
+    // パスコード変更ボタン
+    const changeBtn = document.getElementById("btn-change-passcode");
+    this._settingsHandlers.changePasscode = () => this.changePasscode();
+    changeBtn.addEventListener("click", this._settingsHandlers.changePasscode);
+
+    // テスト動画閉じるボタン
+    const closeTestBtn = document.getElementById("btn-close-test-video");
+    this._settingsHandlers.closeTest = () => this.closeTestVideo();
+    closeTestBtn.addEventListener("click", this._settingsHandlers.closeTest);
+  },
+
+  unbindSettingsEvents() {
+    if (!this._settingsHandlers) return;
+
+    document.getElementById("btn-settings-close").removeEventListener("click", this._settingsHandlers.close);
+    document.getElementById("btn-save-settings").removeEventListener("click", this._settingsHandlers.save);
+    document.getElementById("btn-add-video").removeEventListener("click", this._settingsHandlers.addVideo);
+    document.getElementById("btn-change-passcode").removeEventListener("click", this._settingsHandlers.changePasscode);
+    document.getElementById("btn-close-test-video").removeEventListener("click", this._settingsHandlers.closeTest);
+    this._settingsHandlers = null;
+  },
+
+  // --- 行チェックボックス ---
+  renderRowCheckboxes() {
+    const container = document.getElementById("row-checkboxes");
+    container.innerHTML = "";
+
+    const allRows = Settings.getAllRows();
+    for (const row of allRows) {
+      const label = document.createElement("label");
+      label.className = "row-checkbox-label";
+      if (Settings.isRowEnabled(row.id)) {
+        label.classList.add("checked");
+      }
+
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.checked = Settings.isRowEnabled(row.id);
+      checkbox.dataset.rowId = row.id;
+
+      checkbox.addEventListener("change", () => {
+        label.classList.toggle("checked", checkbox.checked);
+      });
+
+      const text = document.createTextNode(row.label);
+      label.appendChild(checkbox);
+      label.appendChild(text);
+      container.appendChild(label);
+    }
+  },
+
+  // --- セレクトボックス ---
+  renderSelects() {
+    // クリア条件
+    const requiredSelect = document.getElementById("required-clears");
+    requiredSelect.innerHTML = "";
+    for (let i = 1; i <= 10; i++) {
+      const opt = document.createElement("option");
+      opt.value = i;
+      opt.textContent = i;
+      if (i === Settings.requiredClears) opt.selected = true;
+      requiredSelect.appendChild(opt);
+    }
+
+    // 動画上限
+    const limitSelect = document.getElementById("daily-limit");
+    limitSelect.innerHTML = "";
+    for (let i = 1; i <= 10; i++) {
+      const opt = document.createElement("option");
+      opt.value = i;
+      opt.textContent = i;
+      if (i === Settings.dailyVideoLimit) opt.selected = true;
+      limitSelect.appendChild(opt);
+    }
+  },
+
+  // --- 動画リスト ---
+  renderVideoList() {
+    const container = document.getElementById("video-list");
+    container.innerHTML = "";
+
+    if (Settings.videoList.length === 0) {
+      container.innerHTML = '<p style="color: #999; text-align: center;">動画が登録されていません</p>';
+      return;
+    }
+
+    Settings.videoList.forEach((video, index) => {
+      const item = document.createElement("div");
+      item.className = "video-item";
+
+      const info = document.createElement("div");
+      info.className = "video-item-info";
+
+      const title = document.createElement("div");
+      title.className = "video-item-title";
+      title.textContent = video.title;
+
+      const id = document.createElement("div");
+      id.className = "video-item-id";
+      id.textContent = video.id;
+
+      info.appendChild(title);
+      info.appendChild(id);
+
+      const actions = document.createElement("div");
+      actions.className = "video-item-actions";
+
+      const testBtn = document.createElement("button");
+      testBtn.className = "btn-video-action btn-video-test";
+      testBtn.textContent = "▶ テスト";
+      testBtn.addEventListener("click", () => this.testPlayVideo(video.id));
+
+      const deleteBtn = document.createElement("button");
+      deleteBtn.className = "btn-video-action btn-video-delete";
+      deleteBtn.textContent = "削除";
+      // 最後の1本は削除不可
+      if (Settings.videoList.length <= 1) {
+        deleteBtn.disabled = true;
+        deleteBtn.style.opacity = "0.4";
+        deleteBtn.style.cursor = "not-allowed";
+      } else {
+        deleteBtn.addEventListener("click", () => this.deleteVideo(index));
+      }
+
+      actions.appendChild(testBtn);
+      actions.appendChild(deleteBtn);
+
+      item.appendChild(info);
+      item.appendChild(actions);
+      container.appendChild(item);
+    });
+  },
+
+  // --- 動画追加 ---
+  addVideo() {
+    const urlInput = document.getElementById("video-url");
+    const titleInput = document.getElementById("video-title");
+    const url = urlInput.value.trim();
+    const title = titleInput.value.trim();
+
+    if (!url) {
+      alert("YouTube URLを入力してください");
+      return;
+    }
+
+    const videoId = Settings.extractVideoId(url);
+    if (!videoId) {
+      alert("有効なYouTube URLを入力してください");
+      return;
+    }
+
+    const videoTitle = title || `動画 ${Settings.videoList.length + 1}`;
+    Settings.videoList.push({ id: videoId, title: videoTitle });
+    Settings.save();
+
+    urlInput.value = "";
+    titleInput.value = "";
+    this.renderVideoList();
+  },
+
+  // --- 動画削除 ---
+  deleteVideo(index) {
+    if (Settings.videoList.length <= 1) {
+      alert("最低1本は登録が必要です");
+      return;
+    }
+    Settings.videoList.splice(index, 1);
+    Settings.save();
+    this.renderVideoList();
+  },
+
+  // --- テスト再生 ---
+  testPlayVideo(videoId) {
+    const area = document.getElementById("test-video-area");
+    area.classList.remove("hidden");
+
+    if (this.testPlayer) {
+      this.testPlayer.destroy();
+      this.testPlayer = null;
+    }
+
+    // プレイヤーdivを再作成
+    let playerDiv = document.getElementById("test-youtube-player");
+    if (!playerDiv) {
+      playerDiv = document.createElement("div");
+      playerDiv.id = "test-youtube-player";
+      area.insertBefore(playerDiv, area.querySelector(".close-btn"));
+    }
+
+    if (window.YT && window.YT.Player) {
+      this.testPlayer = new YT.Player("test-youtube-player", {
+        videoId: videoId,
+        playerVars: { autoplay: 1, rel: 0, modestbranding: 1, playsinline: 1 },
+      });
+    } else {
+      alert("YouTube APIが読み込まれていません。少し待ってからお試しください。");
+      area.classList.add("hidden");
+    }
+  },
+
+  closeTestVideo() {
+    if (this.testPlayer) {
+      this.testPlayer.destroy();
+      this.testPlayer = null;
+    }
+    const area = document.getElementById("test-video-area");
+    area.classList.add("hidden");
+
+    // プレイヤーdivを再作成
+    const existing = document.getElementById("test-youtube-player");
+    if (!existing) {
+      const div = document.createElement("div");
+      div.id = "test-youtube-player";
+      area.insertBefore(div, area.querySelector(".close-btn"));
+    }
+  },
+
+  // --- パスコード変更 ---
+  changePasscode() {
+    const currentInput = document.getElementById("current-passcode");
+    const newInput = document.getElementById("new-passcode");
+    const msg = document.getElementById("passcode-change-msg");
+
+    const current = currentInput.value;
+    const newCode = newInput.value;
+
+    if (!Settings.verifyPasscode(current)) {
+      msg.textContent = "現在のパスコードが正しくありません";
+      msg.className = "passcode-change-msg error";
+      return;
+    }
+
+    if (!/^\d{4}$/.test(newCode)) {
+      msg.textContent = "新しいパスコードは4桁の数字で入力してください";
+      msg.className = "passcode-change-msg error";
+      return;
+    }
+
+    Settings.passcode = newCode;
+    Settings.save();
+    msg.textContent = "パスコードを変更しました";
+    msg.className = "passcode-change-msg success";
+    currentInput.value = "";
+    newInput.value = "";
+  },
+
+  clearPasscodeChangeForm() {
+    document.getElementById("current-passcode").value = "";
+    document.getElementById("new-passcode").value = "";
+    document.getElementById("passcode-change-msg").textContent = "";
+    document.getElementById("passcode-change-msg").className = "passcode-change-msg";
+  },
+
+  // --- 保存して閉じる ---
+  saveAndClose() {
+    // 行チェックボックスの状態を反映
+    const checkboxes = document.querySelectorAll("#row-checkboxes input[type='checkbox']");
+    let enabledCount = 0;
+    checkboxes.forEach((cb) => {
+      if (cb.checked) enabledCount++;
+    });
+
+    if (enabledCount === 0) {
+      alert("最低1つの行を選択してください");
+      return;
+    }
+
+    checkboxes.forEach((cb) => {
+      Settings.enabledRows[cb.dataset.rowId] = cb.checked;
+    });
+
+    // クリア条件
+    Settings.requiredClears = parseInt(document.getElementById("required-clears").value, 10);
+
+    // 動画上限
+    Settings.dailyVideoLimit = parseInt(document.getElementById("daily-limit").value, 10);
+
+    // 保存
+    Settings.save();
+
+    // 設定画面を閉じる
+    this.hideSettings();
+
+    // 文字選択画面を再描画
+    App.showSelectScreen();
   },
 };
 
