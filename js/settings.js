@@ -11,12 +11,11 @@ const Settings = {
   guideStrokeWidth: 25,        // お手本・マスクの線幅（strokeText用）
   strokeColor: "#FF6B6B",
   strokeWidth: 28,
-  passThreshold: 0.45,
-  sampleStep: 8,
-  hitRadius: 25,
-  minStrokeLengthRatio: 1.5,   // 合計ストローク長 >= canvasSize × この値
+  gridSize: 4,                 // なぞり判定のグリッド分割数（4×4=16マス）
+  defaultMinCoverRatio: 0.6,   // ゾーンカバー率の合格ライン（文字個別設定がない場合）
+  minZoneDensity: 0.10,        // セル内のガイドピクセル密度がこの値以上でゾーンと認識
+  minStrokeLengthRatio: 0.75,  // 合計ストローク長 >= canvasSize × この値（タップ防止）
   maxOutOfBoundsRatio: 0.5,    // はみ出し率がこの値以上なら不合格
-  outOfBoundsRadius: 35,       // はみ出し判定の許容半径
 
   // --- 動的設定値（localStorageで保存） ---
   // パスコード

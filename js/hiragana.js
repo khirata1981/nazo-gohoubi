@@ -7,17 +7,18 @@ const Hiragana = {
   current: "あ",
 
   // 文字データ（あ行・か行）
+  // minCoverRatio: ゾーンカバー率の合格ライン（省略時は Settings.defaultMinCoverRatio）
   characters: {
-    "あ": { char: "あ", strokeCount: 3, row: "あぎょう" },
-    "い": { char: "い", strokeCount: 2, row: "あぎょう" },
-    "う": { char: "う", strokeCount: 2, row: "あぎょう" },
-    "え": { char: "え", strokeCount: 2, row: "あぎょう" },
-    "お": { char: "お", strokeCount: 3, row: "あぎょう" },
-    "か": { char: "か", strokeCount: 3, row: "かぎょう" },
-    "き": { char: "き", strokeCount: 4, row: "かぎょう" },
-    "く": { char: "く", strokeCount: 1, row: "かぎょう" },
-    "け": { char: "け", strokeCount: 3, row: "かぎょう" },
-    "こ": { char: "こ", strokeCount: 2, row: "かぎょう" },
+    "あ": { char: "あ", strokeCount: 3, row: "あぎょう", minCoverRatio: 0.6 },
+    "い": { char: "い", strokeCount: 2, row: "あぎょう", minCoverRatio: 0.5 },
+    "う": { char: "う", strokeCount: 2, row: "あぎょう", minCoverRatio: 0.6 },
+    "え": { char: "え", strokeCount: 2, row: "あぎょう", minCoverRatio: 0.6 },
+    "お": { char: "お", strokeCount: 3, row: "あぎょう", minCoverRatio: 0.6 },
+    "か": { char: "か", strokeCount: 3, row: "かぎょう", minCoverRatio: 0.6 },
+    "き": { char: "き", strokeCount: 4, row: "かぎょう", minCoverRatio: 0.5 },
+    "く": { char: "く", strokeCount: 1, row: "かぎょう", minCoverRatio: 0.6 },
+    "け": { char: "け", strokeCount: 3, row: "かぎょう", minCoverRatio: 0.6 },
+    "こ": { char: "こ", strokeCount: 2, row: "かぎょう", minCoverRatio: 0.6 },
   },
 
   // 利用可能な全文字を配列で返す

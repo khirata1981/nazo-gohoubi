@@ -126,12 +126,13 @@ const TracingCanvas = {
     this.currentStroke = [];
   },
 
-  // --- なぞり判定 ---
+  // --- なぞり判定（ストロークゾーン方式） ---
+  // キャンバスを gridSize×gridSize のグリッドに分割し、
+  // お手本が通るゾーンをユーザーが一定割合通過したかで判定
   evaluate() {
     const size = Settings.canvasSize;
-    const step = Settings.sampleStep;
-    const hitRadius = Settings.hitRadius;
-    const mask = this.guideMask;
+    const gridSize = Settings.gridSize;
+    const cellSize = size / gridSize;
 
     // 全ストロークのポイントをフラットに
     const allPoints = this.strokes.flat();
@@ -139,7 +140,7 @@ const TracingCanvas = {
       return { pass: false, reason: "noStroke" };
     }
 
-    // === 改善1: 最低ストローク長チェック ===
+    // === 最低ストローク長チェック（タップ防止） ===
     let totalLength = 0;
     for (const stroke of this.strokes) {
       for (let i = 1; i < stroke.length; i++) {
@@ -153,79 +154,90 @@ const TracingCanvas = {
       return { pass: false, reason: "tooShort" };
     }
 
-    // === 改善2: はみ出し率チェック ===
-    const obRadius = Settings.outOfBoundsRadius;
-    let outCount = 0;
+    // === お手本ゾーンをマスクから自動検出 ===
+    const guideZones = this.detectGuideZones(gridSize, cellSize);
+    if (guideZones.size === 0) {
+      return { pass: false, reason: "noGuide" };
+    }
+
+    // === ユーザーが通ったゾーンを集計 ===
+    const userZones = new Set();
+    let outOfBoundsCount = 0;
+
     for (const pt of allPoints) {
-      if (!this.isNearGuide(pt, mask, size, obRadius)) {
-        outCount++;
+      const col = Math.floor(pt.x / cellSize);
+      const row = Math.floor(pt.y / cellSize);
+
+      // キャンバス外
+      if (col < 0 || col >= gridSize || row < 0 || row >= gridSize) {
+        outOfBoundsCount++;
+        continue;
+      }
+
+      const key = `${col},${row}`;
+      userZones.add(key);
+
+      // お手本が通らないゾーンのポイントをカウント
+      if (!guideZones.has(key)) {
+        outOfBoundsCount++;
       }
     }
-    const outOfBoundsRatio = outCount / allPoints.length;
+
+    // === はみ出し率チェック（ポイントベース） ===
+    const outOfBoundsRatio = outOfBoundsCount / allPoints.length;
     if (outOfBoundsRatio >= Settings.maxOutOfBoundsRatio) {
       return { pass: false, reason: "outOfBounds" };
     }
 
-    // === 改善3: カバー率チェック ===
-    let guidePoints = [];
-    for (let y = 0; y < size; y += step) {
-      for (let x = 0; x < size; x += step) {
-        const idx = (y * size + x) * 4 + 3; // alpha チャンネル
-        if (mask.data[idx] > 128) {
-          guidePoints.push({ x, y });
-        }
-      }
-    }
-
-    if (guidePoints.length === 0) {
-      return { pass: false, reason: "noGuide" };
-    }
-
+    // === ゾーンカバー率チェック ===
     let hitCount = 0;
-    const r2 = hitRadius * hitRadius;
-
-    for (const gp of guidePoints) {
-      for (const sp of allPoints) {
-        const dx = gp.x - sp.x;
-        const dy = gp.y - sp.y;
-        if (dx * dx + dy * dy <= r2) {
-          hitCount++;
-          break;
-        }
-      }
+    for (const zone of guideZones) {
+      if (userZones.has(zone)) hitCount++;
     }
+    const coverageRatio = hitCount / guideZones.size;
 
-    const coverageRatio = hitCount / guidePoints.length;
-    const pass = coverageRatio >= Settings.passThreshold;
+    // 文字ごとの minCoverRatio（未設定なら Settings のデフォルト値）
+    const charData = Hiragana.characters[Hiragana.current];
+    const minCoverRatio = (charData && charData.minCoverRatio) || Settings.defaultMinCoverRatio;
+    const pass = coverageRatio >= minCoverRatio;
 
     return { pass, reason: pass ? "clear" : "lowCoverage", coverageRatio };
   },
 
-  // ガイドマスクの近傍にユーザーのポイントがあるか判定
-  isNearGuide(pt, mask, size, radius) {
-    const px = Math.round(pt.x);
-    const py = Math.round(pt.y);
+  // ガイドマスクからお手本が通るグリッドゾーンを自動検出
+  // セル内のガイドピクセル密度が閾値以上のセルのみゾーンとして認識
+  detectGuideZones(gridSize, cellSize) {
+    const mask = this.guideMask;
+    const size = Settings.canvasSize;
+    const zones = new Set();
+    const step = 4; // マスクのサンプリング間隔
+    const minDensity = Settings.minZoneDensity;
 
-    // 範囲外はすべてはみ出し扱い
-    if (px < 0 || px >= size || py < 0 || py >= size) return false;
+    for (let row = 0; row < gridSize; row++) {
+      for (let col = 0; col < gridSize; col++) {
+        const x0 = Math.floor(col * cellSize);
+        const y0 = Math.floor(row * cellSize);
+        const x1 = Math.floor((col + 1) * cellSize);
+        const y1 = Math.floor((row + 1) * cellSize);
+        let hitCount = 0;
+        let totalCount = 0;
 
-    // 直接ヒット（高速パス）
-    const directIdx = (py * size + px) * 4 + 3;
-    if (mask.data[directIdx] > 128) return true;
+        for (let y = y0; y < y1; y += step) {
+          for (let x = x0; x < x1; x += step) {
+            totalCount++;
+            const idx = (y * size + x) * 4 + 3;
+            if (mask.data[idx] > 128) {
+              hitCount++;
+            }
+          }
+        }
 
-    // 近傍をステップ間隔で探索
-    const searchStep = 4;
-    const r2 = radius * radius;
-    for (let dy = -radius; dy <= radius; dy += searchStep) {
-      for (let dx = -radius; dx <= radius; dx += searchStep) {
-        if (dx * dx + dy * dy > r2) continue;
-        const cx = px + dx;
-        const cy = py + dy;
-        if (cx < 0 || cx >= size || cy < 0 || cy >= size) continue;
-        const idx = (cy * size + cx) * 4 + 3;
-        if (mask.data[idx] > 128) return true;
+        if (totalCount > 0 && (hitCount / totalCount) >= minDensity) {
+          zones.add(`${col},${row}`);
+        }
       }
     }
-    return false;
+
+    return zones;
   },
 };
