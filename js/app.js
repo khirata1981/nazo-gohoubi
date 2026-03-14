@@ -414,6 +414,11 @@ const SettingsUI = {
     const closeTestBtn = document.getElementById("btn-close-test-video");
     this._settingsHandlers.closeTest = () => this.closeTestVideo();
     closeTestBtn.addEventListener("click", this._settingsHandlers.closeTest);
+
+    // リセットボタン
+    const resetBtn = document.getElementById("btn-reset-progress");
+    this._settingsHandlers.reset = () => this.resetProgress();
+    resetBtn.addEventListener("click", this._settingsHandlers.reset);
   },
 
   unbindSettingsEvents() {
@@ -424,6 +429,7 @@ const SettingsUI = {
     document.getElementById("btn-add-video").removeEventListener("click", this._settingsHandlers.addVideo);
     document.getElementById("btn-change-passcode").removeEventListener("click", this._settingsHandlers.changePasscode);
     document.getElementById("btn-close-test-video").removeEventListener("click", this._settingsHandlers.closeTest);
+    document.getElementById("btn-reset-progress").removeEventListener("click", this._settingsHandlers.reset);
     this._settingsHandlers = null;
   },
 
@@ -656,6 +662,27 @@ const SettingsUI = {
     document.getElementById("new-passcode").value = "";
     document.getElementById("passcode-change-msg").textContent = "";
     document.getElementById("passcode-change-msg").className = "passcode-change-msg";
+  },
+
+  // --- 学習データリセット ---
+  resetProgress() {
+    if (!confirm("すべてのクリアきろくをけします。よろしいですか？")) {
+      return;
+    }
+
+    // クリア済み文字をリセット
+    App.clearedChars.clear();
+    App.sessionClears = 0;
+    localStorage.removeItem("nazo-gohoubi-cleared");
+
+    // 今日の動画再生回数をリセット
+    Settings.todayVideoCount = 0;
+    Settings.lastPlayDate = "";
+    Settings.save();
+
+    // 設定画面を閉じて文字選択画面に戻る
+    this.hideSettings();
+    App.showSelectScreen();
   },
 
   // --- 保存して閉じる ---

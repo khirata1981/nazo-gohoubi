@@ -213,6 +213,7 @@ body::before {
   transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.1s;
   position: relative;
   overflow: hidden;
+  white-space: nowrap;
 }
 
 /* ぽよんアニメーション */
@@ -290,10 +291,20 @@ body::before {
 /* --- ボタンエリア --- */
 .button-area {
   display: flex;
-  gap: 16px;
+  gap: 10px;
   margin-top: 8px;
   position: relative;
   z-index: 110;
+  padding: 0 8px;
+  width: 100%;
+  max-width: 500px;
+  justify-content: center;
+}
+
+.button-area .btn {
+  flex: 1;
+  padding: 0 12px;
+  min-width: 0;
 }
 
 /* --- クリア演出 --- */
@@ -325,7 +336,17 @@ body::before {
 
 .clear-buttons {
   display: flex;
-  gap: 16px;
+  gap: 10px;
+  padding: 0 16px;
+  width: 100%;
+  max-width: 500px;
+  justify-content: center;
+}
+
+.clear-buttons .btn {
+  flex: 1;
+  padding: 0 12px;
+  min-width: 0;
 }
 
 /* --- 紙吹雪コンテナ --- */
@@ -904,6 +925,24 @@ body::before {
   color: #FF4444;
 }
 
+/* リセットボタン */
+.btn-reset-progress {
+  font-family: inherit;
+  font-size: 1em;
+  font-weight: bold;
+  background: #FF4444;
+  color: #FFF;
+  border: none;
+  border-radius: 12px;
+  padding: 14px 24px;
+  cursor: pointer;
+  width: 100%;
+}
+
+.btn-reset-progress:active {
+  background: #CC3333;
+}
+
 /* 保存ボタン */
 .settings-footer {
   padding: 16px 24px;
@@ -960,6 +999,26 @@ body::before {
   .row-label {
     font-size: 1em;
     margin: 8px 0 4px 4px;
+  }
+
+  .btn {
+    font-size: 1.1em;
+    min-height: 70px;
+    border-radius: 20px;
+  }
+
+  .button-area {
+    gap: 8px;
+    padding: 0 6px;
+  }
+
+  .clear-buttons {
+    gap: 8px;
+    padding: 0 12px;
+  }
+
+  .clear-overlay .clear-text {
+    font-size: 2.8em;
   }
 }
 
