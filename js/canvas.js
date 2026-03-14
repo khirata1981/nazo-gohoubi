@@ -9,6 +9,8 @@ const TracingCanvas = {
   strokes: [],       // ユーザーが描いた座標 [[{x,y}, ...], ...]
   currentStroke: [],
   guideMask: null,
+  guideComponents: [],  // ガイドマスクの連結成分（独立パーツ検出用）
+  componentMap: null,   // ピクセル→コンポーネントIDのマップ
 
   init(canvasEl) {
     this.canvas = canvasEl;
@@ -39,6 +41,9 @@ const TracingCanvas = {
 
     // 判定用マスクを生成
     this.guideMask = Hiragana.createGuideMask(size);
+
+    // 連結成分を検出（点などの独立パーツを識別）
+    this.guideComponents = this.findMaskComponents();
   },
 
   // --- イベント ---
@@ -126,12 +131,13 @@ const TracingCanvas = {
     this.currentStroke = [];
   },
 
-  // --- なぞり判定 ---
+  // --- なぞり判定（ストロークゾーン方式） ---
+  // キャンバスを gridSize×gridSize のグリッドに分割し、
+  // お手本が通るゾーンをユーザーが一定割合通過したかで判定
   evaluate() {
     const size = Settings.canvasSize;
-    const step = Settings.sampleStep;
-    const hitRadius = Settings.hitRadius;
-    const mask = this.guideMask;
+    const gridSize = Settings.gridSize;
+    const cellSize = size / gridSize;
 
     // 全ストロークのポイントをフラットに
     const allPoints = this.strokes.flat();
@@ -139,7 +145,7 @@ const TracingCanvas = {
       return { pass: false, reason: "noStroke" };
     }
 
-    // === 改善1: 最低ストローク長チェック ===
+    // === 最低ストローク長チェック（タップ防止） ===
     let totalLength = 0;
     for (const stroke of this.strokes) {
       for (let i = 1; i < stroke.length; i++) {
@@ -153,79 +159,179 @@ const TracingCanvas = {
       return { pass: false, reason: "tooShort" };
     }
 
-    // === 改善2: はみ出し率チェック ===
-    const obRadius = Settings.outOfBoundsRadius;
-    let outCount = 0;
+    // === お手本ゾーンをマスクから自動検出 ===
+    const guideZones = this.detectGuideZones(gridSize, cellSize);
+    if (guideZones.size === 0) {
+      return { pass: false, reason: "noGuide" };
+    }
+
+    // === ユーザーが通ったゾーンを集計 + ピクセルベースはみ出し判定 ===
+    const userZones = new Set();
+    let outOfBoundsCount = 0;
+    const mask = this.guideMask;
+
     for (const pt of allPoints) {
-      if (!this.isNearGuide(pt, mask, size, obRadius)) {
-        outCount++;
+      const col = Math.floor(pt.x / cellSize);
+      const row = Math.floor(pt.y / cellSize);
+
+      // キャンバス外
+      if (col < 0 || col >= gridSize || row < 0 || row >= gridSize) {
+        outOfBoundsCount++;
+        continue;
+      }
+
+      // ゾーン通過を記録
+      const key = `${col},${row}`;
+      userZones.add(key);
+
+      // ピクセルベースのはみ出しチェック（マスクのピクセルに乗っていなければはみ出し）
+      const px = Math.min(Math.max(Math.floor(pt.x), 0), size - 1);
+      const py = Math.min(Math.max(Math.floor(pt.y), 0), size - 1);
+      const pidx = (py * size + px) * 4 + 3;
+      if (mask.data[pidx] <= 128) {
+        outOfBoundsCount++;
       }
     }
-    const outOfBoundsRatio = outCount / allPoints.length;
+
+    // === はみ出し率チェック（ピクセルベース） ===
+    const outOfBoundsRatio = outOfBoundsCount / allPoints.length;
     if (outOfBoundsRatio >= Settings.maxOutOfBoundsRatio) {
       return { pass: false, reason: "outOfBounds" };
     }
 
-    // === 改善3: カバー率チェック ===
-    let guidePoints = [];
-    for (let y = 0; y < size; y += step) {
-      for (let x = 0; x < size; x += step) {
-        const idx = (y * size + x) * 4 + 3; // alpha チャンネル
-        if (mask.data[idx] > 128) {
-          guidePoints.push({ x, y });
-        }
+    // === コンポーネントカバーチェック（点などの独立パーツ到達確認） ===
+    // componentMap を使い、ユーザーのストロークが各パーツの実際のピクセル上を通ったか判定
+    // マスク自体が maskStrokeWidth(20px) の太さを持つので、追加のtolerance不要
+    const coveredComps = new Set();
+    const compMap = this.componentMap;
+
+    for (const pt of allPoints) {
+      const px = Math.min(Math.max(Math.floor(pt.x), 0), size - 1);
+      const py = Math.min(Math.max(Math.floor(pt.y), 0), size - 1);
+      const cid = compMap[py * size + px];
+      if (cid > 0) coveredComps.add(cid);
+
+      // 全コンポーネントがカバーされたら早期終了
+      if (coveredComps.size >= this.guideComponents.length) break;
+    }
+
+    for (const comp of this.guideComponents) {
+      if (!coveredComps.has(comp.id)) {
+        return { pass: false, reason: "missedPart" };
       }
     }
 
-    if (guidePoints.length === 0) {
-      return { pass: false, reason: "noGuide" };
-    }
-
+    // === ゾーンカバー率チェック ===
     let hitCount = 0;
-    const r2 = hitRadius * hitRadius;
-
-    for (const gp of guidePoints) {
-      for (const sp of allPoints) {
-        const dx = gp.x - sp.x;
-        const dy = gp.y - sp.y;
-        if (dx * dx + dy * dy <= r2) {
-          hitCount++;
-          break;
-        }
-      }
+    for (const zone of guideZones) {
+      if (userZones.has(zone)) hitCount++;
     }
+    const coverageRatio = hitCount / guideZones.size;
 
-    const coverageRatio = hitCount / guidePoints.length;
-    const pass = coverageRatio >= Settings.passThreshold;
+    // 文字ごとの minCoverRatio（未設定なら Settings のデフォルト値）
+    const charData = Hiragana.characters[Hiragana.current];
+    const minCoverRatio = (charData && charData.minCoverRatio) || Settings.defaultMinCoverRatio;
+    const pass = coverageRatio >= minCoverRatio;
 
     return { pass, reason: pass ? "clear" : "lowCoverage", coverageRatio };
   },
 
-  // ガイドマスクの近傍にユーザーのポイントがあるか判定
-  isNearGuide(pt, mask, size, radius) {
-    const px = Math.round(pt.x);
-    const py = Math.round(pt.y);
+  // ガイドマスクのピクセルから連結成分を検出（BFS）
+  // 点や独立した画のような分離パーツを識別する
+  // 各ピクセルにコンポーネントIDを割り当てたマップも構築
+  findMaskComponents() {
+    const mask = this.guideMask;
+    const size = Settings.canvasSize;
+    const minPixels = Settings.minComponentPixels;
+    const compMap = new Uint16Array(size * size);
+    const components = [];
+    let nextId = 1;
 
-    // 範囲外はすべてはみ出し扱い
-    if (px < 0 || px >= size || py < 0 || py >= size) return false;
+    for (let y = 0; y < size; y++) {
+      for (let x = 0; x < size; x++) {
+        const idx = (y * size + x) * 4 + 3;
+        if (mask.data[idx] > 128 && compMap[y * size + x] === 0) {
+          const id = nextId++;
+          const queue = [{x, y}];
+          let qi = 0;
+          compMap[y * size + x] = id;
+          let count = 0;
+          let minX = x, maxX = x, minY = y, maxY = y;
 
-    // 直接ヒット（高速パス）
-    const directIdx = (py * size + px) * 4 + 3;
-    if (mask.data[directIdx] > 128) return true;
+          while (qi < queue.length) {
+            const p = queue[qi++];
+            count++;
+            if (p.x < minX) minX = p.x;
+            if (p.x > maxX) maxX = p.x;
+            if (p.y < minY) minY = p.y;
+            if (p.y > maxY) maxY = p.y;
 
-    // 近傍をステップ間隔で探索
-    const searchStep = 4;
-    const r2 = radius * radius;
-    for (let dy = -radius; dy <= radius; dy += searchStep) {
-      for (let dx = -radius; dx <= radius; dx += searchStep) {
-        if (dx * dx + dy * dy > r2) continue;
-        const cx = px + dx;
-        const cy = py + dy;
-        if (cx < 0 || cx >= size || cy < 0 || cy >= size) continue;
-        const idx = (cy * size + cx) * 4 + 3;
-        if (mask.data[idx] > 128) return true;
+            // 4方向の隣接ピクセルをチェック
+            const neighbors = [
+              {x: p.x + 1, y: p.y}, {x: p.x - 1, y: p.y},
+              {x: p.x, y: p.y + 1}, {x: p.x, y: p.y - 1},
+            ];
+            for (const n of neighbors) {
+              if (n.x >= 0 && n.x < size && n.y >= 0 && n.y < size) {
+                const nIdx = (n.y * size + n.x) * 4 + 3;
+                if (mask.data[nIdx] > 128 && compMap[n.y * size + n.x] === 0) {
+                  compMap[n.y * size + n.x] = id;
+                  queue.push(n);
+                }
+              }
+            }
+          }
+
+          // 一定サイズ以上のコンポーネントのみ記録
+          if (count >= minPixels) {
+            components.push({
+              id: id,
+              size: count,
+              bbox: {x0: minX, y0: minY, x1: maxX, y1: maxY},
+            });
+          }
+        }
       }
     }
-    return false;
+
+    this.componentMap = compMap;
+    return components;
+  },
+
+  // ガイドマスクからお手本が通るグリッドゾーンを自動検出
+  // セル内のガイドピクセル密度が閾値以上のセルのみゾーンとして認識
+  detectGuideZones(gridSize, cellSize) {
+    const mask = this.guideMask;
+    const size = Settings.canvasSize;
+    const zones = new Set();
+    const step = 4; // マスクのサンプリング間隔
+    const minDensity = Settings.minZoneDensity;
+
+    for (let row = 0; row < gridSize; row++) {
+      for (let col = 0; col < gridSize; col++) {
+        const x0 = Math.floor(col * cellSize);
+        const y0 = Math.floor(row * cellSize);
+        const x1 = Math.floor((col + 1) * cellSize);
+        const y1 = Math.floor((row + 1) * cellSize);
+        let hitCount = 0;
+        let totalCount = 0;
+
+        for (let y = y0; y < y1; y += step) {
+          for (let x = x0; x < x1; x += step) {
+            totalCount++;
+            const idx = (y * size + x) * 4 + 3;
+            if (mask.data[idx] > 128) {
+              hitCount++;
+            }
+          }
+        }
+
+        if (totalCount > 0 && (hitCount / totalCount) >= minDensity) {
+          zones.add(`${col},${row}`);
+        }
+      }
+    }
+
+    return zones;
   },
 };
