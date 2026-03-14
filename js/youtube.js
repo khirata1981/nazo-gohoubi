@@ -35,7 +35,7 @@ const YouTube = {
     }
 
     this.player = new YT.Player(containerId, {
-      videoId: Settings.youtubeVideoId,
+      videoId: Settings.getRandomVideoId(),
       playerVars: {
         autoplay: 1,
         rel: 0,

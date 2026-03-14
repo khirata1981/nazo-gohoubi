@@ -342,6 +342,451 @@ body {
   aspect-ratio: 16 / 9;
 }
 
+/* --- 設定ボタン（文字選択画面右下） --- */
+.btn-settings {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  font-family: inherit;
+  font-size: 0.9em;
+  background: #E0E0E0;
+  color: #666;
+  border: none;
+  border-radius: 12px;
+  padding: 10px 18px;
+  cursor: pointer;
+  z-index: 50;
+}
+
+.btn-settings:active {
+  background: #D0D0D0;
+}
+
+/* --- 動画上限メッセージ --- */
+.limit-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(100, 100, 200, 0.2);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 24px;
+  z-index: 100;
+  animation: fadeIn 0.3s ease;
+}
+
+.limit-text {
+  font-size: 2.8em;
+  color: #6B6BFF;
+  font-weight: bold;
+}
+
+.limit-sub {
+  font-size: 1.6em;
+  color: #888;
+}
+
+/* --- パスコード入力画面 --- */
+.passcode-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 300;
+}
+
+.passcode-dialog {
+  background: #FFF;
+  border-radius: 24px;
+  padding: 32px;
+  text-align: center;
+  max-width: 360px;
+  width: 90%;
+}
+
+.passcode-dialog h2 {
+  font-size: 1.4em;
+  color: #333;
+  margin-bottom: 24px;
+}
+
+.passcode-dots {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.dot {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 3px solid #CCC;
+  background: #FFF;
+}
+
+.dot.filled {
+  background: #333;
+  border-color: #333;
+}
+
+.passcode-error {
+  color: #FF4444;
+  font-size: 0.9em;
+  min-height: 1.2em;
+  margin-bottom: 8px;
+}
+
+.numpad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  max-width: 280px;
+  margin: 0 auto;
+}
+
+.numpad-btn {
+  font-family: inherit;
+  font-size: 1.6em;
+  font-weight: bold;
+  width: 80px;
+  height: 64px;
+  border: 2px solid #DDD;
+  border-radius: 14px;
+  background: #F8F8F8;
+  color: #333;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.numpad-btn:active {
+  background: #E8E8E8;
+  transform: scale(0.95);
+}
+
+.numpad-cancel {
+  color: #FF4444;
+  border-color: #FFCCCC;
+}
+
+.numpad-delete {
+  color: #666;
+}
+
+/* --- 親設定画面 --- */
+.settings-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 300;
+  animation: fadeIn 0.2s ease;
+}
+
+.settings-container {
+  background: #FFF;
+  border-radius: 20px;
+  width: 94%;
+  max-width: 600px;
+  max-height: 90dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.settings-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid #EEE;
+}
+
+.settings-header h2 {
+  font-size: 1.4em;
+  color: #333;
+}
+
+.settings-close-btn {
+  font-family: inherit;
+  font-size: 1em;
+  background: #E0E0E0;
+  border: none;
+  border-radius: 10px;
+  padding: 8px 16px;
+  cursor: pointer;
+  color: #555;
+}
+
+.settings-close-btn:active {
+  background: #D0D0D0;
+}
+
+.settings-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 24px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.settings-section {
+  margin-bottom: 28px;
+}
+
+.settings-section h3 {
+  font-size: 1.1em;
+  color: #555;
+  margin-bottom: 12px;
+  padding-bottom: 6px;
+  border-bottom: 2px solid #FFB347;
+}
+
+/* 行チェックボックス */
+.row-checkboxes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.row-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.1em;
+  cursor: pointer;
+  padding: 10px 20px;
+  border: 2px solid #DDD;
+  border-radius: 12px;
+  background: #F8F8F8;
+  user-select: none;
+}
+
+.row-checkbox-label input[type="checkbox"] {
+  width: 22px;
+  height: 22px;
+  accent-color: #FF6B6B;
+}
+
+.row-checkbox-label.checked {
+  border-color: #FF6B6B;
+  background: #FFF0F0;
+}
+
+/* 設定の行 */
+.setting-row {
+  margin-bottom: 12px;
+}
+
+.setting-row label {
+  font-size: 1.1em;
+  color: #333;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.setting-select {
+  font-family: inherit;
+  font-size: 1.1em;
+  padding: 8px 12px;
+  border: 2px solid #DDD;
+  border-radius: 10px;
+  background: #FFF;
+  color: #333;
+  min-width: 70px;
+  text-align: center;
+}
+
+.setting-input {
+  font-family: inherit;
+  font-size: 1em;
+  padding: 10px 14px;
+  border: 2px solid #DDD;
+  border-radius: 10px;
+  background: #FFF;
+  color: #333;
+  width: 100%;
+}
+
+.setting-input:focus {
+  outline: none;
+  border-color: #FFB347;
+}
+
+.passcode-input {
+  max-width: 160px;
+  letter-spacing: 8px;
+  text-align: center;
+}
+
+/* 動画リスト */
+.video-list {
+  margin-bottom: 16px;
+}
+
+.video-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  background: #F8F8F8;
+  border-radius: 12px;
+  margin-bottom: 8px;
+}
+
+.video-item-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.video-item-title {
+  font-weight: bold;
+  font-size: 1em;
+  color: #333;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.video-item-id {
+  font-size: 0.8em;
+  color: #999;
+}
+
+.video-item-actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.btn-video-action {
+  font-family: inherit;
+  font-size: 0.85em;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+.btn-video-test {
+  background: #74C0FC;
+  color: #FFF;
+}
+
+.btn-video-test:active {
+  background: #5AA3DD;
+}
+
+.btn-video-delete {
+  background: #FFCCCC;
+  color: #CC3333;
+}
+
+.btn-video-delete:active {
+  background: #FFAAAA;
+}
+
+/* 動画追加フォーム */
+.video-add-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.btn-add-video {
+  font-family: inherit;
+  font-size: 1em;
+  font-weight: bold;
+  background: #77DD77;
+  color: #FFF;
+  border: none;
+  border-radius: 12px;
+  padding: 12px;
+  cursor: pointer;
+}
+
+.btn-add-video:active {
+  background: #5EBB5E;
+}
+
+/* パスコード変更 */
+.passcode-change {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.btn-change-passcode {
+  font-family: inherit;
+  font-size: 1em;
+  font-weight: bold;
+  background: #74C0FC;
+  color: #FFF;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 24px;
+  cursor: pointer;
+  align-self: flex-start;
+}
+
+.btn-change-passcode:active {
+  background: #5AA3DD;
+}
+
+.passcode-change-msg {
+  font-size: 0.9em;
+  min-height: 1.2em;
+}
+
+.passcode-change-msg.success {
+  color: #22AA22;
+}
+
+.passcode-change-msg.error {
+  color: #FF4444;
+}
+
+/* 保存ボタン */
+.settings-footer {
+  padding: 16px 24px;
+  border-top: 1px solid #EEE;
+}
+
+.btn-save-settings {
+  font-family: inherit;
+  font-size: 1.2em;
+  font-weight: bold;
+  background: #FF6B6B;
+  color: #FFF;
+  border: none;
+  border-radius: 14px;
+  padding: 16px;
+  width: 100%;
+  cursor: pointer;
+  box-shadow: 0 4px 0 #CC5555;
+}
+
+.btn-save-settings:active {
+  box-shadow: 0 2px 0 #CC5555;
+  transform: translateY(2px);
+}
+
 /* --- 非表示 --- */
 .hidden {
   display: none !important;

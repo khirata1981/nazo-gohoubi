@@ -18,6 +18,8 @@
             <p id="progress-text" class="progress-text"></p>
         </div>
         <div id="char-grid" class="char-grid"></div>
+        <!-- 設定ボタン -->
+        <button id="btn-settings" class="btn-settings">⚙ せってい</button>
     </div>
 
     <!-- なぞり画面 -->
@@ -50,10 +52,125 @@
         <button id="btn-reward" class="btn btn-reward">🎬 どうがを みる！</button>
     </div>
 
+    <!-- 動画上限メッセージ -->
+    <div id="limit-overlay" class="limit-overlay hidden">
+        <div class="limit-text">きょうの どうがは おわりだよ</div>
+        <p class="limit-sub">また あした がんばろう！</p>
+        <button id="btn-limit-ok" class="btn btn-next">もじをえらぶ</button>
+    </div>
+
     <!-- YouTube エリア -->
     <div id="youtube-area" class="youtube-area hidden">
         <div id="youtube-player"></div>
         <button id="btn-close-video" class="close-btn">✕</button>
+    </div>
+
+    <!-- パスコード入力画面 -->
+    <div id="passcode-screen" class="passcode-screen hidden">
+        <div class="passcode-dialog">
+            <h2>パスコードを入力</h2>
+            <div class="passcode-dots">
+                <span class="dot" id="dot-0"></span>
+                <span class="dot" id="dot-1"></span>
+                <span class="dot" id="dot-2"></span>
+                <span class="dot" id="dot-3"></span>
+            </div>
+            <p id="passcode-error" class="passcode-error"></p>
+            <div class="numpad">
+                <button class="numpad-btn" data-num="1">1</button>
+                <button class="numpad-btn" data-num="2">2</button>
+                <button class="numpad-btn" data-num="3">3</button>
+                <button class="numpad-btn" data-num="4">4</button>
+                <button class="numpad-btn" data-num="5">5</button>
+                <button class="numpad-btn" data-num="6">6</button>
+                <button class="numpad-btn" data-num="7">7</button>
+                <button class="numpad-btn" data-num="8">8</button>
+                <button class="numpad-btn" data-num="9">9</button>
+                <button class="numpad-btn numpad-cancel" data-action="cancel">✕</button>
+                <button class="numpad-btn" data-num="0">0</button>
+                <button class="numpad-btn numpad-delete" data-action="delete">←</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 親設定画面 -->
+    <div id="settings-screen" class="settings-screen hidden">
+        <div class="settings-container">
+            <div class="settings-header">
+                <h2>設定</h2>
+                <button id="btn-settings-close" class="settings-close-btn">✕ 閉じる</button>
+            </div>
+
+            <div class="settings-body">
+                <!-- 練習する行の選択 -->
+                <section class="settings-section">
+                    <h3>練習する行</h3>
+                    <div id="row-checkboxes" class="row-checkboxes"></div>
+                </section>
+
+                <!-- クリア条件 -->
+                <section class="settings-section">
+                    <h3>クリア条件</h3>
+                    <div class="setting-row">
+                        <label for="required-clears">
+                            <select id="required-clears" class="setting-select"></select>
+                            文字なぞったら1動画
+                        </label>
+                    </div>
+                </section>
+
+                <!-- 1日の動画上限 -->
+                <section class="settings-section">
+                    <h3>1日の動画上限</h3>
+                    <div class="setting-row">
+                        <label for="daily-limit">
+                            1日
+                            <select id="daily-limit" class="setting-select"></select>
+                            回まで
+                        </label>
+                    </div>
+                </section>
+
+                <!-- ごほうび動画リスト -->
+                <section class="settings-section">
+                    <h3>ごほうび動画リスト</h3>
+                    <div id="video-list" class="video-list"></div>
+                    <div class="video-add-form">
+                        <input type="text" id="video-url" class="setting-input" placeholder="YouTube URL を貼り付け">
+                        <input type="text" id="video-title" class="setting-input" placeholder="タイトル（例: パウパト #1）">
+                        <button id="btn-add-video" class="btn-add-video">+ 追加</button>
+                    </div>
+                </section>
+
+                <!-- パスコード変更 -->
+                <section class="settings-section">
+                    <h3>パスコード変更</h3>
+                    <div class="passcode-change">
+                        <div class="setting-row">
+                            <label>現在のパスコード</label>
+                            <input type="password" id="current-passcode" class="setting-input passcode-input" maxlength="4" inputmode="numeric" pattern="[0-9]*">
+                        </div>
+                        <div class="setting-row">
+                            <label>新しいパスコード</label>
+                            <input type="password" id="new-passcode" class="setting-input passcode-input" maxlength="4" inputmode="numeric" pattern="[0-9]*">
+                        </div>
+                        <button id="btn-change-passcode" class="btn-change-passcode">パスコードを変更</button>
+                        <p id="passcode-change-msg" class="passcode-change-msg"></p>
+                    </div>
+                </section>
+            </div>
+
+            <!-- 保存ボタン -->
+            <div class="settings-footer">
+                <button id="btn-save-settings" class="btn-save-settings">保存して閉じる</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- テスト再生用YouTube -->
+    <div id="test-video-area" class="youtube-area hidden">
+        <div id="test-youtube-player"></div>
+        <button id="btn-close-test-video" class="close-btn">✕ 閉じる</button>
     </div>
 
     <!-- JS（読み込み順序が重要） -->
