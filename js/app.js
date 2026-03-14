@@ -161,12 +161,18 @@ const App = {
   },
 
   checkTracing() {
-    const score = TracingCanvas.evaluate();
-    if (score >= Settings.passThreshold) {
+    const result = TracingCanvas.evaluate();
+    if (result.pass) {
       this.onCharCleared();
     } else {
       const msg = document.getElementById("message");
-      msg.textContent = "もうすこし なぞってみよう！";
+      if (result.reason === "tooShort") {
+        msg.textContent = "もっと たくさん なぞってみよう！";
+      } else if (result.reason === "outOfBounds") {
+        msg.textContent = "おてほんの うえを なぞってね！";
+      } else {
+        msg.textContent = "もうすこし なぞってみよう！";
+      }
       setTimeout(() => {
         if (this.screen === "tracing") {
           msg.textContent = `「${Hiragana.current}」を ゆびで なぞってね！`;

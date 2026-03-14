@@ -10,9 +10,12 @@ const Settings = {
   guideColor: "rgba(200, 200, 200, 0.4)",
   strokeColor: "#FF6B6B",
   strokeWidth: 28,
-  passThreshold: 0.4,
+  passThreshold: 0.55,
   sampleStep: 8,
-  hitRadius: 30,
+  hitRadius: 20,
+  minStrokeLengthRatio: 1.5,   // 合計ストローク長 >= canvasSize × この値
+  maxOutOfBoundsRatio: 0.5,    // はみ出し率がこの値以上なら不合格
+  outOfBoundsRadius: 40,       // はみ出し判定の許容半径
 
   // --- 動的設定値（localStorageで保存） ---
   // パスコード

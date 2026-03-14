@@ -133,7 +133,40 @@ const TracingCanvas = {
     const hitRadius = Settings.hitRadius;
     const mask = this.guideMask;
 
-    // お手本文字のピクセル座標をサンプリング
+    // 全ストロークのポイントをフラットに
+    const allPoints = this.strokes.flat();
+    if (allPoints.length === 0) {
+      return { pass: false, reason: "noStroke" };
+    }
+
+    // === 改善1: 最低ストローク長チェック ===
+    let totalLength = 0;
+    for (const stroke of this.strokes) {
+      for (let i = 1; i < stroke.length; i++) {
+        const dx = stroke[i].x - stroke[i - 1].x;
+        const dy = stroke[i].y - stroke[i - 1].y;
+        totalLength += Math.sqrt(dx * dx + dy * dy);
+      }
+    }
+    const minLength = size * Settings.minStrokeLengthRatio;
+    if (totalLength < minLength) {
+      return { pass: false, reason: "tooShort" };
+    }
+
+    // === 改善2: はみ出し率チェック ===
+    const obRadius = Settings.outOfBoundsRadius;
+    let outCount = 0;
+    for (const pt of allPoints) {
+      if (!this.isNearGuide(pt, mask, size, obRadius)) {
+        outCount++;
+      }
+    }
+    const outOfBoundsRatio = outCount / allPoints.length;
+    if (outOfBoundsRatio >= Settings.maxOutOfBoundsRatio) {
+      return { pass: false, reason: "outOfBounds" };
+    }
+
+    // === 改善3: カバー率チェック ===
     let guidePoints = [];
     for (let y = 0; y < size; y += step) {
       for (let x = 0; x < size; x += step) {
@@ -144,13 +177,10 @@ const TracingCanvas = {
       }
     }
 
-    if (guidePoints.length === 0) return 0;
+    if (guidePoints.length === 0) {
+      return { pass: false, reason: "noGuide" };
+    }
 
-    // 全ストロークのポイントをフラットに
-    const allPoints = this.strokes.flat();
-    if (allPoints.length === 0) return 0;
-
-    // 各ガイドポイントに対して、ユーザーストロークが近くを通ったか判定
     let hitCount = 0;
     const r2 = hitRadius * hitRadius;
 
@@ -165,6 +195,37 @@ const TracingCanvas = {
       }
     }
 
-    return hitCount / guidePoints.length;
+    const coverageRatio = hitCount / guidePoints.length;
+    const pass = coverageRatio >= Settings.passThreshold;
+
+    return { pass, reason: pass ? "clear" : "lowCoverage", coverageRatio };
+  },
+
+  // ガイドマスクの近傍にユーザーのポイントがあるか判定
+  isNearGuide(pt, mask, size, radius) {
+    const px = Math.round(pt.x);
+    const py = Math.round(pt.y);
+
+    // 範囲外はすべてはみ出し扱い
+    if (px < 0 || px >= size || py < 0 || py >= size) return false;
+
+    // 直接ヒット（高速パス）
+    const directIdx = (py * size + px) * 4 + 3;
+    if (mask.data[directIdx] > 128) return true;
+
+    // 近傍をステップ間隔で探索
+    const searchStep = 4;
+    const r2 = radius * radius;
+    for (let dy = -radius; dy <= radius; dy += searchStep) {
+      for (let dx = -radius; dx <= radius; dx += searchStep) {
+        if (dx * dx + dy * dy > r2) continue;
+        const cx = px + dx;
+        const cy = py + dy;
+        if (cx < 0 || cx >= size || cy < 0 || cy >= size) continue;
+        const idx = (cy * size + cx) * 4 + 3;
+        if (mask.data[idx] > 128) return true;
+      }
+    }
+    return false;
   },
 };
