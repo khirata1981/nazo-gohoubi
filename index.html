@@ -12,28 +12,42 @@
         <h1>✏️ なぞって ごほうび！</h1>
     </div>
 
-    <!-- メイン画面 -->
-    <div class="main-screen">
-        <p id="message" class="message">「あ」を ゆびで なぞってね！</p>
+    <!-- 文字選択画面 -->
+    <div id="select-screen" class="select-screen">
+        <div class="progress-bar">
+            <p id="progress-text" class="progress-text"></p>
+        </div>
+        <div id="char-grid" class="char-grid"></div>
+    </div>
+
+    <!-- なぞり画面 -->
+    <div id="tracing-screen" class="tracing-screen hidden">
+        <p id="message" class="message"></p>
 
         <div class="canvas-area">
             <canvas id="tracing-canvas"></canvas>
         </div>
 
         <div class="button-area">
+            <button id="btn-back" class="btn btn-back">もどる</button>
             <button id="btn-clear" class="btn btn-clear">けす</button>
-            <button id="btn-check" class="btn btn-clear">できた！</button>
-        </div>
-
-        <div class="button-area">
-            <button id="btn-reward" class="btn btn-reward hidden">🎬 ごほうび どうがを みる！</button>
-            <button id="btn-retry" class="btn btn-retry hidden">もういちど</button>
+            <button id="btn-check" class="btn btn-check">できた！</button>
         </div>
     </div>
 
     <!-- クリア演出 -->
     <div id="clear-overlay" class="clear-overlay hidden">
         <div class="clear-text">⭐ すごい！ ⭐</div>
+        <div class="clear-buttons">
+            <button id="btn-next" class="btn btn-next">つぎのもじ</button>
+            <button id="btn-select" class="btn btn-back">もじをえらぶ</button>
+        </div>
+    </div>
+
+    <!-- ごほうび演出 -->
+    <div id="reward-overlay" class="reward-overlay hidden">
+        <div class="reward-text">🎉 ごほうびタイム！ 🎉</div>
+        <button id="btn-reward" class="btn btn-reward">🎬 どうがを みる！</button>
     </div>
 
     <!-- YouTube エリア -->
