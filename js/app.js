@@ -158,6 +158,7 @@ const App = {
     msg.textContent = `「${Hiragana.current}」を ゆびで なぞってね！`;
 
     TracingCanvas.reset();
+    TracingCanvas.updateDisplaySize();
   },
 
   checkTracing() {
