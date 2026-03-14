@@ -4,23 +4,49 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>なぞって ごほうび！</title>
-    <style>
-        body {
-            margin: 0;
-            padding: 40px;
-            font-family: "Hiragino Maru Gothic ProN", "BIZ UDPGothic", sans-serif;
-            background: #FFF8E7;
-            text-align: center;
-        }
-        h1 { font-size: 2em; color: #FF6B6B; }
-        p { font-size: 1.2em; color: #555; }
-    </style>
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <h1>✏️ なぞって ごほうび！</h1>
-    <p>じゅんび ちゅう...</p>
-    <p style="font-size: 0.9em; color: #999; margin-top: 40px;">
-        この画面が見えていれば、環境構築は成功です！
-    </p>
+    <!-- ヘッダー -->
+    <div class="header">
+        <h1>✏️ なぞって ごほうび！</h1>
+    </div>
+
+    <!-- メイン画面 -->
+    <div class="main-screen">
+        <p id="message" class="message">「あ」を ゆびで なぞってね！</p>
+
+        <div class="canvas-area">
+            <canvas id="tracing-canvas"></canvas>
+        </div>
+
+        <div class="button-area">
+            <button id="btn-clear" class="btn btn-clear">けす</button>
+            <button id="btn-check" class="btn btn-clear">できた！</button>
+        </div>
+
+        <div class="button-area">
+            <button id="btn-reward" class="btn btn-reward hidden">🎬 ごほうび どうがを みる！</button>
+            <button id="btn-retry" class="btn btn-retry hidden">もういちど</button>
+        </div>
+    </div>
+
+    <!-- クリア演出 -->
+    <div id="clear-overlay" class="clear-overlay hidden">
+        <div class="clear-text">⭐ すごい！ ⭐</div>
+    </div>
+
+    <!-- YouTube エリア -->
+    <div id="youtube-area" class="youtube-area hidden">
+        <div id="youtube-player"></div>
+        <button id="btn-close-video" class="close-btn">✕</button>
+    </div>
+
+    <!-- JS（読み込み順序が重要） -->
+    <script src="js/settings.js"></script>
+    <script src="js/hiragana.js"></script>
+    <script src="js/canvas.js"></script>
+    <script src="js/youtube.js"></script>
+    <script src="js/app.js"></script>
 </body>
 </html>
