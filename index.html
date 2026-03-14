@@ -2,8 +2,17 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>なぞって ごほうび！</title>
+
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="なぞりれんしゅう">
+    <link rel="apple-touch-icon" href="icons/icon-192.png">
+    <meta name="theme-color" content="#FF6B6B">
+
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -48,7 +57,8 @@
 
     <!-- ごほうび演出 -->
     <div id="reward-overlay" class="reward-overlay hidden">
-        <div class="reward-text">🎉 ごほうびタイム！ 🎉</div>
+        <div class="reward-text">🎉 よくがんばりました！ 🎉</div>
+        <div class="reward-sub-text">ごほうびタイム！</div>
         <button id="btn-reward" class="btn btn-reward">🎬 どうがを みる！</button>
     </div>
 
@@ -179,5 +189,12 @@
     <script src="js/canvas.js"></script>
     <script src="js/youtube.js"></script>
     <script src="js/app.js"></script>
+
+    <!-- Service Worker 登録 -->
+    <script>
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.register("sw.js").catch(() => {});
+      }
+    </script>
 </body>
 </html>

@@ -11,6 +11,20 @@ const App = {
   // 今回のセッションでクリアした文字数（ごほうびカウント用）
   sessionClears: 0,
 
+  // ほめ言葉リスト
+  praiseWords: [
+    "すごい！",
+    "やったね！",
+    "じょうず！",
+    "ばっちり！",
+    "すばらしい！",
+    "かっこいい！",
+    "きれいにかけたね！",
+    "がんばったね！",
+    "さいこう！",
+    "おみごと！",
+  ],
+
   async init() {
     // クリア済みデータを読み込み
     this.loadProgress();
@@ -191,13 +205,20 @@ const App = {
 
   showClearOverlay() {
     this.screen = "cleared";
+    // ほめ言葉をランダムに設定
+    const praise = this.praiseWords[Math.floor(Math.random() * this.praiseWords.length)];
+    document.querySelector(".clear-text").textContent = `⭐ ${praise} ⭐`;
     document.getElementById("clear-overlay").classList.remove("hidden");
+    // 紙吹雪を表示
+    this.showConfetti(30);
   },
 
   showRewardScreen() {
     this.screen = "reward";
     document.getElementById("clear-overlay").classList.add("hidden");
     document.getElementById("reward-overlay").classList.remove("hidden");
+    // 豪華な紙吹雪
+    this.showConfetti(60);
   },
 
   showLimitScreen() {
@@ -205,6 +226,34 @@ const App = {
     document.getElementById("clear-overlay").classList.add("hidden");
     document.getElementById("tracing-screen").classList.add("hidden");
     document.getElementById("limit-overlay").classList.remove("hidden");
+  },
+
+  // 紙吹雪エフェクト（CSSアニメーションのみ）
+  showConfetti(count) {
+    const container = document.createElement("div");
+    container.className = "confetti-container";
+    document.body.appendChild(container);
+
+    const colors = ["#FF6B6B", "#FFD93D", "#74C0FC", "#77DD77", "#FFB347", "#FF9FF3", "#A29BFE"];
+    const shapes = ["circle", "square", "star"];
+
+    for (let i = 0; i < count; i++) {
+      const piece = document.createElement("div");
+      const shape = shapes[Math.floor(Math.random() * shapes.length)];
+      piece.className = `confetti ${shape}`;
+      piece.style.left = `${Math.random() * 100}%`;
+      piece.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+      piece.style.animationDelay = `${Math.random() * 1.5}s`;
+      piece.style.animationDuration = `${2 + Math.random() * 2}s`;
+      container.appendChild(piece);
+    }
+
+    // 4秒後に紙吹雪を削除
+    setTimeout(() => {
+      if (container.parentNode) {
+        container.parentNode.removeChild(container);
+      }
+    }, 4500);
   },
 
   // 次の未クリア文字へ進む
