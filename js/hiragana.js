@@ -33,8 +33,8 @@ const Hiragana = {
     "う": {
       char: "う", strokeCount: 2, row: "あぎょう",
       requiredAreas: [
-        { x: 140, y: 20, w: 100, h: 60, label: "上の点" },
-        { x: 80, y: 100, w: 240, h: 260, label: "下の曲線" },
+        { x: 100, y: 35, w: 160, h: 100, label: "上の点" },
+        { x: 60, y: 100, w: 280, h: 270, label: "下の曲線" },
       ],
       minAreasRequired: 2,
       minStrokeLengthRatio: 1.0,
@@ -280,9 +280,10 @@ const Hiragana = {
     "ふ": {
       char: "ふ", strokeCount: 4, row: "はぎょう",
       requiredAreas: [
-        { x: 140, y: 20, w: 120, h: 80, label: "上の点" },
-        { x: 40, y: 120, w: 140, h: 140, label: "左の点" },
-        { x: 80, y: 240, w: 240, h: 140, label: "下のカーブ" },
+        { x: 110, y: 15, w: 160, h: 120, label: "上の点" },
+        { x: 20, y: 110, w: 180, h: 150, label: "左の点" },
+        { x: 230, y: 100, w: 160, h: 120, label: "右の点" },
+        { x: 50, y: 220, w: 300, h: 160, label: "下のカーブ" },
       ],
       minAreasRequired: 3,
       minStrokeLengthRatio: 1.0,
