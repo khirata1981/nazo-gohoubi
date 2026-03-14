@@ -66,8 +66,11 @@ body::before {
   align-items: center;
   height: calc(100dvh - 60px);
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   overscroll-behavior-y: contain;
+  touch-action: pan-y;
   padding: 0 16px 24px;
+  padding-bottom: 80px;
   position: relative;
   z-index: 1;
 }
@@ -929,6 +932,35 @@ body::before {
 /* --- 非表示 --- */
 .hidden {
   display: none !important;
+}
+
+/* --- iPhone 縦向き最適化（小さい画面で5文字並ぶように） --- */
+@media screen and (max-width: 420px) {
+  .char-card {
+    width: 60px;
+    height: 60px;
+    border-width: 3px;
+    border-radius: 14px;
+  }
+
+  .char-card .char-text {
+    font-size: 2.2em;
+  }
+
+  .char-card .char-star {
+    font-size: 0.9em;
+    top: 2px;
+    right: 4px;
+  }
+
+  .card-row {
+    gap: 8px;
+  }
+
+  .row-label {
+    font-size: 1em;
+    margin: 8px 0 4px 4px;
+  }
 }
 
 /* --- iPad 横向き最適化 --- */
