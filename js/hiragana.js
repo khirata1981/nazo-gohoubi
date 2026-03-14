@@ -64,18 +64,21 @@ const Hiragana = {
     }
   },
 
-  // お手本をキャンバスに描画
+  // お手本をキャンバスに描画（strokeTextで線の輪郭のみ）
   drawGuide(ctx, size) {
     ctx.save();
     ctx.font = `${Settings.guideFontSize}px "${Settings.guideFont}"`;
-    ctx.fillStyle = Settings.guideColor;
+    ctx.strokeStyle = Settings.guideColor;
+    ctx.lineWidth = Settings.guideStrokeWidth;
+    ctx.lineJoin = "round";
+    ctx.lineCap = "round";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.fillText(this.current, size / 2, size / 2 + 10);
+    ctx.strokeText(this.current, size / 2, size / 2 + 10);
     ctx.restore();
   },
 
-  // お手本文字のピクセルマスクを生成
+  // お手本文字のピクセルマスクを生成（strokeTextで線の部分だけ）
   createGuideMask(size) {
     const offscreen = document.createElement("canvas");
     offscreen.width = size;
@@ -83,10 +86,13 @@ const Hiragana = {
     const ctx = offscreen.getContext("2d");
 
     ctx.font = `${Settings.guideFontSize}px "${Settings.guideFont}"`;
-    ctx.fillStyle = "#000";
+    ctx.strokeStyle = "#000";
+    ctx.lineWidth = Settings.guideStrokeWidth;
+    ctx.lineJoin = "round";
+    ctx.lineCap = "round";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.fillText(this.current, size / 2, size / 2 + 10);
+    ctx.strokeText(this.current, size / 2, size / 2 + 10);
 
     return ctx.getImageData(0, 0, size, size);
   },
