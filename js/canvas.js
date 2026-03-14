@@ -15,6 +15,12 @@ const TracingCanvas = {
     this.resize();
     this.bindEvents();
     this.reset();
+
+    // スマホ横向き対応: リサイズ・回転でキャンバス表示サイズを更新
+    window.addEventListener("resize", () => this.updateDisplaySize());
+    window.addEventListener("orientationchange", () => {
+      setTimeout(() => this.updateDisplaySize(), 150);
+    });
   },
 
   resize() {
@@ -25,6 +31,25 @@ const TracingCanvas = {
     this.canvas.style.width = size + "px";
     this.canvas.style.height = size + "px";
     this.ctx.scale(dpr, dpr);
+  },
+
+  // スマホ横向き時のキャンバス表示サイズ調整
+  // 論理サイズ(400px)は維持し、表示サイズのみ変更
+  updateDisplaySize() {
+    if (!this.canvas) return;
+    const isSmallLandscape = window.matchMedia(
+      "(orientation: landscape) and (max-height: 500px)"
+    ).matches;
+
+    if (isSmallLandscape) {
+      const vh = window.innerHeight;
+      const displaySize = Math.max(Math.min(Math.floor(vh - 24), 400), 150);
+      this.canvas.style.width = displaySize + "px";
+      this.canvas.style.height = displaySize + "px";
+    } else {
+      this.canvas.style.width = Settings.canvasSize + "px";
+      this.canvas.style.height = Settings.canvasSize + "px";
+    }
   },
 
   reset() {

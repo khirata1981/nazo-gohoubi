@@ -1059,3 +1059,175 @@ body::before {
     font-size: 3.5em;
   }
 }
+
+/* --- スマホ横向き（ランドスケープ）最適化 --- */
+/* max-height: 500px でスマホとタブレットを区別 */
+@media screen and (orientation: landscape) and (max-height: 500px) {
+  /* ヘッダー非表示で画面を最大活用 */
+  .header {
+    display: none;
+  }
+
+  /* --- 文字選択画面 --- */
+  .select-screen {
+    height: 100dvh;
+    padding: 8px 16px;
+    padding-left: max(16px, env(safe-area-inset-left));
+    padding-right: max(16px, env(safe-area-inset-right));
+    padding-bottom: 50px;
+  }
+
+  .progress-bar {
+    margin-bottom: 8px;
+    padding: 6px 12px;
+  }
+
+  .progress-text {
+    font-size: 1.2em;
+  }
+
+  .char-card {
+    width: 70px;
+    height: 70px;
+    border-radius: 14px;
+  }
+
+  .char-card .char-text {
+    font-size: 2.4em;
+  }
+
+  .char-card .char-star {
+    font-size: 0.9em;
+    top: 2px;
+    right: 4px;
+  }
+
+  .row-label {
+    font-size: 1em;
+    margin: 6px 0 4px 4px;
+  }
+
+  .card-row {
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+
+  /* --- なぞり画面 - 横並びグリッドレイアウト --- */
+  .tracing-screen {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto 1fr;
+    height: 100dvh;
+    padding: 8px;
+    padding-left: max(8px, env(safe-area-inset-left));
+    padding-right: max(8px, env(safe-area-inset-right));
+    padding-bottom: max(8px, env(safe-area-inset-bottom));
+    gap: 8px;
+  }
+
+  .canvas-area {
+    grid-column: 1;
+    grid-row: 1 / -1;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  #tracing-canvas {
+    border-width: 3px;
+    border-radius: 12px;
+  }
+
+  .message {
+    grid-column: 2;
+    grid-row: 1;
+    font-size: 1.2em;
+    margin: 0;
+    min-height: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .button-area {
+    grid-column: 2;
+    grid-row: 2;
+    flex-direction: column;
+    max-width: none;
+    width: auto;
+    margin: 0;
+    padding: 0;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .button-area .btn {
+    flex: none;
+    min-height: 56px;
+    font-size: 1.1em;
+    padding: 0 20px;
+  }
+
+  /* --- クリア演出 --- */
+  .clear-overlay {
+    gap: 16px;
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+
+  .clear-overlay .clear-text {
+    font-size: 2.5em;
+  }
+
+  .clear-buttons {
+    max-width: 400px;
+  }
+
+  .clear-buttons .btn {
+    min-height: 56px;
+    font-size: 1.1em;
+  }
+
+  /* --- ごほうび演出 --- */
+  .reward-overlay {
+    gap: 16px;
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+
+  .reward-overlay .reward-text {
+    font-size: 2em;
+  }
+
+  .reward-sub-text {
+    font-size: 1.2em;
+  }
+
+  .btn-reward {
+    min-height: 64px;
+    font-size: 1.3em;
+  }
+
+  /* --- 動画上限画面 --- */
+  .limit-overlay {
+    gap: 16px;
+  }
+
+  .limit-text {
+    font-size: 1.8em;
+  }
+
+  .limit-sub {
+    font-size: 1.2em;
+  }
+
+  /* --- 設定ボタン --- */
+  .btn-settings {
+    bottom: 8px;
+    right: max(8px, env(safe-area-inset-right));
+    padding: 8px 14px;
+    font-size: 0.8em;
+  }
+}
