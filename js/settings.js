@@ -21,6 +21,14 @@ const Settings = {
   enabledRows: {
     "あぎょう": true,
     "かぎょう": true,
+    "さぎょう": false,
+    "たぎょう": false,
+    "なぎょう": false,
+    "はぎょう": false,
+    "まぎょう": false,
+    "やぎょう": false,
+    "らぎょう": false,
+    "わぎょう": false,
   },
 
   // クリア条件（何文字なぞったら動画1回）
@@ -143,9 +151,14 @@ const Settings = {
     return [
       { id: "あぎょう", label: "あ行" },
       { id: "かぎょう", label: "か行" },
-      // 将来の追加用
-      // { id: "さぎょう", label: "さ行" },
-      // { id: "たぎょう", label: "た行" },
+      { id: "さぎょう", label: "さ行" },
+      { id: "たぎょう", label: "た行" },
+      { id: "なぎょう", label: "な行" },
+      { id: "はぎょう", label: "は行" },
+      { id: "まぎょう", label: "ま行" },
+      { id: "やぎょう", label: "や行" },
+      { id: "らぎょう", label: "ら行" },
+      { id: "わぎょう", label: "わ行" },
     ];
   },
 
