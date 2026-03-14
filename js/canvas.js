@@ -82,18 +82,22 @@ const TracingCanvas = {
 
   getTouchPos(e) {
     const rect = this.canvas.getBoundingClientRect();
+    const scaleX = Settings.canvasSize / rect.width;
+    const scaleY = Settings.canvasSize / rect.height;
     const touch = e.touches[0];
     return {
-      x: touch.clientX - rect.left,
-      y: touch.clientY - rect.top,
+      x: (touch.clientX - rect.left) * scaleX,
+      y: (touch.clientY - rect.top) * scaleY,
     };
   },
 
   getMousePos(e) {
     const rect = this.canvas.getBoundingClientRect();
+    const scaleX = Settings.canvasSize / rect.width;
+    const scaleY = Settings.canvasSize / rect.height;
     return {
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
+      x: (e.clientX - rect.left) * scaleX,
+      y: (e.clientY - rect.top) * scaleY,
     };
   },
 
