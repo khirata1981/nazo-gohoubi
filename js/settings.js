@@ -7,15 +7,16 @@ const Settings = {
   canvasSize: 400,
   guideFont: "Hiragino Maru Gothic ProN",
   guideFontSize: 320,
-  guideColor: "rgba(200, 200, 200, 0.4)",
+  guideColor: "rgba(200, 200, 200, 0.5)",
+  guideStrokeWidth: 25,        // お手本・マスクの線幅（strokeText用）
   strokeColor: "#FF6B6B",
   strokeWidth: 28,
-  passThreshold: 0.55,
+  passThreshold: 0.45,
   sampleStep: 8,
-  hitRadius: 20,
+  hitRadius: 25,
   minStrokeLengthRatio: 1.5,   // 合計ストローク長 >= canvasSize × この値
   maxOutOfBoundsRatio: 0.5,    // はみ出し率がこの値以上なら不合格
-  outOfBoundsRadius: 40,       // はみ出し判定の許容半径
+  outOfBoundsRadius: 35,       // はみ出し判定の許容半径
 
   // --- 動的設定値（localStorageで保存） ---
   // パスコード
