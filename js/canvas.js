@@ -9,6 +9,8 @@ const TracingCanvas = {
   strokes: [],       // ユーザーが描いた座標 [[{x,y}, ...], ...]
   currentStroke: [],
   guideMask: null,
+  guideComponents: [],  // ガイドマスクの連結成分（独立パーツ検出用）
+  componentMap: null,   // ピクセル→コンポーネントIDのマップ
 
   init(canvasEl) {
     this.canvas = canvasEl;
@@ -39,6 +41,9 @@ const TracingCanvas = {
 
     // 判定用マスクを生成
     this.guideMask = Hiragana.createGuideMask(size);
+
+    // 連結成分を検出（点などの独立パーツを識別）
+    this.guideComponents = this.findMaskComponents();
   },
 
   // --- イベント ---
@@ -160,9 +165,10 @@ const TracingCanvas = {
       return { pass: false, reason: "noGuide" };
     }
 
-    // === ユーザーが通ったゾーンを集計 ===
+    // === ユーザーが通ったゾーンを集計 + ピクセルベースはみ出し判定 ===
     const userZones = new Set();
     let outOfBoundsCount = 0;
+    const mask = this.guideMask;
 
     for (const pt of allPoints) {
       const col = Math.floor(pt.x / cellSize);
@@ -174,19 +180,45 @@ const TracingCanvas = {
         continue;
       }
 
+      // ゾーン通過を記録
       const key = `${col},${row}`;
       userZones.add(key);
 
-      // お手本が通らないゾーンのポイントをカウント
-      if (!guideZones.has(key)) {
+      // ピクセルベースのはみ出しチェック（マスクのピクセルに乗っていなければはみ出し）
+      const px = Math.min(Math.max(Math.floor(pt.x), 0), size - 1);
+      const py = Math.min(Math.max(Math.floor(pt.y), 0), size - 1);
+      const pidx = (py * size + px) * 4 + 3;
+      if (mask.data[pidx] <= 128) {
         outOfBoundsCount++;
       }
     }
 
-    // === はみ出し率チェック（ポイントベース） ===
+    // === はみ出し率チェック（ピクセルベース） ===
     const outOfBoundsRatio = outOfBoundsCount / allPoints.length;
     if (outOfBoundsRatio >= Settings.maxOutOfBoundsRatio) {
       return { pass: false, reason: "outOfBounds" };
+    }
+
+    // === コンポーネントカバーチェック（点などの独立パーツ到達確認） ===
+    // componentMap を使い、ユーザーのストロークが各パーツの実際のピクセル上を通ったか判定
+    // マスク自体が maskStrokeWidth(20px) の太さを持つので、追加のtolerance不要
+    const coveredComps = new Set();
+    const compMap = this.componentMap;
+
+    for (const pt of allPoints) {
+      const px = Math.min(Math.max(Math.floor(pt.x), 0), size - 1);
+      const py = Math.min(Math.max(Math.floor(pt.y), 0), size - 1);
+      const cid = compMap[py * size + px];
+      if (cid > 0) coveredComps.add(cid);
+
+      // 全コンポーネントがカバーされたら早期終了
+      if (coveredComps.size >= this.guideComponents.length) break;
+    }
+
+    for (const comp of this.guideComponents) {
+      if (!coveredComps.has(comp.id)) {
+        return { pass: false, reason: "missedPart" };
+      }
     }
 
     // === ゾーンカバー率チェック ===
@@ -202,6 +234,68 @@ const TracingCanvas = {
     const pass = coverageRatio >= minCoverRatio;
 
     return { pass, reason: pass ? "clear" : "lowCoverage", coverageRatio };
+  },
+
+  // ガイドマスクのピクセルから連結成分を検出（BFS）
+  // 点や独立した画のような分離パーツを識別する
+  // 各ピクセルにコンポーネントIDを割り当てたマップも構築
+  findMaskComponents() {
+    const mask = this.guideMask;
+    const size = Settings.canvasSize;
+    const minPixels = Settings.minComponentPixels;
+    const compMap = new Uint16Array(size * size);
+    const components = [];
+    let nextId = 1;
+
+    for (let y = 0; y < size; y++) {
+      for (let x = 0; x < size; x++) {
+        const idx = (y * size + x) * 4 + 3;
+        if (mask.data[idx] > 128 && compMap[y * size + x] === 0) {
+          const id = nextId++;
+          const queue = [{x, y}];
+          let qi = 0;
+          compMap[y * size + x] = id;
+          let count = 0;
+          let minX = x, maxX = x, minY = y, maxY = y;
+
+          while (qi < queue.length) {
+            const p = queue[qi++];
+            count++;
+            if (p.x < minX) minX = p.x;
+            if (p.x > maxX) maxX = p.x;
+            if (p.y < minY) minY = p.y;
+            if (p.y > maxY) maxY = p.y;
+
+            // 4方向の隣接ピクセルをチェック
+            const neighbors = [
+              {x: p.x + 1, y: p.y}, {x: p.x - 1, y: p.y},
+              {x: p.x, y: p.y + 1}, {x: p.x, y: p.y - 1},
+            ];
+            for (const n of neighbors) {
+              if (n.x >= 0 && n.x < size && n.y >= 0 && n.y < size) {
+                const nIdx = (n.y * size + n.x) * 4 + 3;
+                if (mask.data[nIdx] > 128 && compMap[n.y * size + n.x] === 0) {
+                  compMap[n.y * size + n.x] = id;
+                  queue.push(n);
+                }
+              }
+            }
+          }
+
+          // 一定サイズ以上のコンポーネントのみ記録
+          if (count >= minPixels) {
+            components.push({
+              id: id,
+              size: count,
+              bbox: {x0: minX, y0: minY, x1: maxX, y1: maxY},
+            });
+          }
+        }
+      }
+    }
+
+    this.componentMap = compMap;
+    return components;
   },
 
   // ガイドマスクからお手本が通るグリッドゾーンを自動検出

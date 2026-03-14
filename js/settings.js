@@ -8,14 +8,16 @@ const Settings = {
   guideFont: "Hiragino Maru Gothic ProN",
   guideFontSize: 320,
   guideColor: "rgba(200, 200, 200, 0.5)",
-  guideStrokeWidth: 25,        // お手本・マスクの線幅（strokeText用）
+  guideStrokeWidth: 25,        // お手本表示用の線幅（strokeText用）
+  maskStrokeWidth: 20,         // 判定用マスクの線幅（表示より細くして判定を正確に）
   strokeColor: "#FF6B6B",
   strokeWidth: 28,
-  gridSize: 4,                 // なぞり判定のグリッド分割数（4×4=16マス）
-  defaultMinCoverRatio: 0.6,   // ゾーンカバー率の合格ライン（文字個別設定がない場合）
-  minZoneDensity: 0.10,        // セル内のガイドピクセル密度がこの値以上でゾーンと認識
+  gridSize: 8,                 // なぞり判定のグリッド分割数（8×8=64マス）
+  defaultMinCoverRatio: 0.5,   // ゾーンカバー率の合格ライン（文字個別設定がない場合）
+  minZoneDensity: 0.06,        // セル内のガイドピクセル密度がこの値以上でゾーンと認識
   minStrokeLengthRatio: 0.75,  // 合計ストローク長 >= canvasSize × この値（タップ防止）
-  maxOutOfBoundsRatio: 0.5,    // はみ出し率がこの値以上なら不合格
+  maxOutOfBoundsRatio: 0.5,    // はみ出し率がこの値以上なら不合格（ピクセルベース）
+  minComponentPixels: 200,     // この値以上のピクセル数の連結成分を必須パーツとして扱う
 
   // --- 動的設定値（localStorageで保存） ---
   // パスコード

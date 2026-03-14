@@ -9,16 +9,16 @@ const Hiragana = {
   // 文字データ（あ行・か行）
   // minCoverRatio: ゾーンカバー率の合格ライン（省略時は Settings.defaultMinCoverRatio）
   characters: {
-    "あ": { char: "あ", strokeCount: 3, row: "あぎょう", minCoverRatio: 0.6 },
-    "い": { char: "い", strokeCount: 2, row: "あぎょう", minCoverRatio: 0.5 },
-    "う": { char: "う", strokeCount: 2, row: "あぎょう", minCoverRatio: 0.6 },
-    "え": { char: "え", strokeCount: 2, row: "あぎょう", minCoverRatio: 0.6 },
-    "お": { char: "お", strokeCount: 3, row: "あぎょう", minCoverRatio: 0.6 },
-    "か": { char: "か", strokeCount: 3, row: "かぎょう", minCoverRatio: 0.6 },
-    "き": { char: "き", strokeCount: 4, row: "かぎょう", minCoverRatio: 0.5 },
-    "く": { char: "く", strokeCount: 1, row: "かぎょう", minCoverRatio: 0.6 },
-    "け": { char: "け", strokeCount: 3, row: "かぎょう", minCoverRatio: 0.6 },
-    "こ": { char: "こ", strokeCount: 2, row: "かぎょう", minCoverRatio: 0.6 },
+    "あ": { char: "あ", strokeCount: 3, row: "あぎょう", minCoverRatio: 0.5 },
+    "い": { char: "い", strokeCount: 2, row: "あぎょう", minCoverRatio: 0.45 },
+    "う": { char: "う", strokeCount: 2, row: "あぎょう", minCoverRatio: 0.5 },
+    "え": { char: "え", strokeCount: 2, row: "あぎょう", minCoverRatio: 0.5 },
+    "お": { char: "お", strokeCount: 3, row: "あぎょう", minCoverRatio: 0.5 },
+    "か": { char: "か", strokeCount: 3, row: "かぎょう", minCoverRatio: 0.5 },
+    "き": { char: "き", strokeCount: 4, row: "かぎょう", minCoverRatio: 0.45 },
+    "く": { char: "く", strokeCount: 1, row: "かぎょう", minCoverRatio: 0.45 },
+    "け": { char: "け", strokeCount: 3, row: "かぎょう", minCoverRatio: 0.5 },
+    "こ": { char: "こ", strokeCount: 2, row: "かぎょう", minCoverRatio: 0.5 },
   },
 
   // 利用可能な全文字を配列で返す
@@ -88,7 +88,7 @@ const Hiragana = {
 
     ctx.font = `${Settings.guideFontSize}px "${Settings.guideFont}"`;
     ctx.strokeStyle = "#000";
-    ctx.lineWidth = Settings.guideStrokeWidth;
+    ctx.lineWidth = Settings.maskStrokeWidth;
     ctx.lineJoin = "round";
     ctx.lineCap = "round";
     ctx.textAlign = "center";
