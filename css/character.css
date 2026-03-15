@@ -1,5 +1,5 @@
 /* ========================================
-   キャラクター & ごほうびアニメーション
+   恐竜ゲット演出 & きょうりゅう ずかん
    ======================================== */
 
 /* --- アニメーションオーバーレイ --- */
@@ -40,215 +40,12 @@
   position: relative;
   width: 100%;
   max-width: 600px;
-  height: 280px;
+  height: 320px;
   flex-shrink: 1;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: visible;
-}
-
-/* --- ブロックくん（水色） --- */
-.block-kun {
-  position: absolute;
-  width: 90px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.block-kun .head {
-  width: 60px; height: 60px;
-  background: #74C0FC;
-  border: 3px solid #4AA3E0;
-  position: relative;
-}
-
-.block-kun .eye-left,
-.block-kun .eye-right {
-  position: absolute;
-  width: 10px; height: 10px;
-  background: #333;
-  top: 20px;
-}
-.block-kun .eye-left { left: 14px; }
-.block-kun .eye-right { right: 14px; }
-
-.block-kun .mouth {
-  position: absolute;
-  width: 12px; height: 6px;
-  background: #333;
-  bottom: 12px;
-  left: 50%;
-  transform: translateX(-50%);
-}
-
-.block-kun .body {
-  width: 50px; height: 40px;
-  background: #5BAEE0;
-  border: 3px solid #4AA3E0;
-  margin-top: -3px;
-}
-
-.block-kun .arm-left,
-.block-kun .arm-right {
-  position: absolute;
-  width: 14px; height: 30px;
-  background: #74C0FC;
-  border: 2px solid #4AA3E0;
-  top: 65px;
-}
-.block-kun .arm-left { left: 0; }
-.block-kun .arm-right { right: 0; }
-
-.block-kun .leg-left,
-.block-kun .leg-right {
-  position: absolute;
-  width: 18px; height: 20px;
-  background: #5BAEE0;
-  border: 2px solid #4AA3E0;
-  bottom: 0;
-}
-.block-kun .leg-left { left: 14px; }
-.block-kun .leg-right { right: 14px; }
-
-/* --- キューブちゃん（ピンク） --- */
-.cube-chan {
-  position: absolute;
-  width: 80px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.cube-chan .head {
-  width: 52px; height: 52px;
-  background: #FF9FF3;
-  border: 3px solid #E07BC0;
-  position: relative;
-}
-
-.cube-chan .ribbon {
-  position: absolute;
-  top: -14px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 24px; height: 12px;
-  background: #FF6B6B;
-  border: 2px solid #E04E4E;
-}
-.cube-chan .ribbon::before,
-.cube-chan .ribbon::after {
-  content: "";
-  position: absolute;
-  width: 10px; height: 10px;
-  background: #FF6B6B;
-  border: 2px solid #E04E4E;
-  top: -2px;
-}
-.cube-chan .ribbon::before { left: -10px; }
-.cube-chan .ribbon::after { right: -10px; }
-
-.cube-chan .eye-left,
-.cube-chan .eye-right {
-  position: absolute;
-  width: 9px; height: 9px;
-  background: #333;
-  top: 18px;
-}
-.cube-chan .eye-left { left: 11px; }
-.cube-chan .eye-right { right: 11px; }
-
-.cube-chan .cheek-left,
-.cube-chan .cheek-right {
-  position: absolute;
-  width: 8px; height: 6px;
-  background: #FF6B6B;
-  opacity: 0.6;
-  top: 30px;
-}
-.cube-chan .cheek-left { left: 6px; }
-.cube-chan .cheek-right { right: 6px; }
-
-.cube-chan .mouth {
-  position: absolute;
-  width: 8px; height: 4px;
-  background: #333;
-  bottom: 10px;
-  left: 50%;
-  transform: translateX(-50%);
-}
-
-.cube-chan .body {
-  width: 44px; height: 35px;
-  background: #FFB8E8;
-  border: 3px solid #E07BC0;
-  margin-top: -3px;
-}
-
-.cube-chan .arm-left,
-.cube-chan .arm-right {
-  position: absolute;
-  width: 12px; height: 26px;
-  background: #FF9FF3;
-  border: 2px solid #E07BC0;
-  top: 57px;
-}
-.cube-chan .arm-left { left: 0; }
-.cube-chan .arm-right { right: 0; }
-
-.cube-chan .leg-left,
-.cube-chan .leg-right {
-  position: absolute;
-  width: 16px; height: 18px;
-  background: #FFB8E8;
-  border: 2px solid #E07BC0;
-  bottom: 0;
-}
-.cube-chan .leg-left { left: 12px; }
-.cube-chan .leg-right { right: 12px; }
-
-/* --- 吹き出し --- */
-.speech-bubble {
-  position: absolute;
-  background: white;
-  border: 3px solid #FFD93D;
-  border-radius: 16px;
-  padding: 12px 20px;
-  font-size: 1.4em;
-  font-weight: bold;
-  color: #333;
-  white-space: nowrap;
-  opacity: 0;
-  top: 10px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 10;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.speech-bubble::after {
-  content: "";
-  position: absolute;
-  bottom: -12px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 0; height: 0;
-  border-left: 10px solid transparent;
-  border-right: 10px solid transparent;
-  border-top: 12px solid white;
-}
-
-.speech-bubble::before {
-  content: "";
-  position: absolute;
-  bottom: -16px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 0; height: 0;
-  border-left: 12px solid transparent;
-  border-right: 12px solid transparent;
-  border-top: 14px solid #FFD93D;
 }
 
 /* --- アニメーション後のボタン --- */
@@ -273,292 +70,531 @@
 }
 
 /* ========================================
-   パターン1: おうえん
+   卵の演出
    ======================================== */
-.anim-ouen .block-kun {
-  left: -100px;
-  animation: slideInLeft 0.8s ease-out forwards;
+
+.dino-egg {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.anim-ouen .cube-chan {
-  right: -100px;
-  animation: slideInRight 0.8s ease-out 0.3s forwards;
+.egg-body {
+  width: 100px;
+  height: 130px;
+  background: linear-gradient(135deg, #FFECD2, #FCE4B8);
+  border: 4px solid #E8C97A;
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  position: relative;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15), inset 0 -10px 20px rgba(0, 0, 0, 0.05);
 }
 
-@keyframes slideInLeft {
-  from { left: -100px; }
-  to { left: 60px; }
+.egg-spot {
+  position: absolute;
+  border-radius: 50%;
+  background: #E8C97A;
+  opacity: 0.5;
 }
 
-@keyframes slideInRight {
-  from { right: -100px; }
-  to { right: 60px; }
+.egg-spot.spot-1 {
+  width: 18px; height: 14px;
+  top: 25px; left: 20px;
 }
 
-.anim-ouen .block-kun.jumping {
-  animation: jumpBounce 0.5s ease-in-out infinite;
+.egg-spot.spot-2 {
+  width: 14px; height: 10px;
+  top: 55px; right: 18px;
 }
 
-.anim-ouen .cube-chan.jumping {
-  animation: jumpBounce 0.5s ease-in-out 0.25s infinite;
+.egg-spot.spot-3 {
+  width: 12px; height: 12px;
+  bottom: 25px; left: 35px;
 }
 
-@keyframes jumpBounce {
+/* ヒビ */
+.egg-crack {
+  position: absolute;
+  width: 0; height: 0;
+}
+
+.egg-crack.crack-1 {
+  top: 30%;
+  left: 20%;
+  border-left: 2px solid #8B7355;
+  height: 30px;
+  transform: rotate(15deg);
+  animation: crackAppear 0.3s ease-out;
+}
+
+.egg-crack.crack-1::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 0;
+  border-left: 2px solid #8B7355;
+  height: 20px;
+  transform: rotate(-30deg);
+}
+
+.egg-crack.crack-2 {
+  top: 25%;
+  right: 25%;
+  border-left: 2px solid #8B7355;
+  height: 25px;
+  transform: rotate(-20deg);
+  animation: crackAppear 0.3s ease-out;
+}
+
+.egg-crack.crack-2::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 0;
+  border-left: 2px solid #8B7355;
+  height: 18px;
+  transform: rotate(25deg);
+}
+
+@keyframes crackAppear {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* 震え（弱） */
+.dino-egg.shaking {
+  animation: eggShake 0.15s ease-in-out infinite;
+}
+
+@keyframes eggShake {
+  0%, 100% { transform: translateX(0) rotate(0deg); }
+  25% { transform: translateX(-4px) rotate(-2deg); }
+  75% { transform: translateX(4px) rotate(2deg); }
+}
+
+/* 震え（強） */
+.dino-egg.shaking-hard {
+  animation: eggShakeHard 0.08s ease-in-out infinite;
+}
+
+@keyframes eggShakeHard {
+  0%, 100% { transform: translateX(0) rotate(0deg); }
+  25% { transform: translateX(-8px) rotate(-4deg); }
+  75% { transform: translateX(8px) rotate(4deg); }
+}
+
+/* 卵割れる */
+.dino-egg.explode {
+  animation: eggExplode 0.3s ease-out forwards;
+}
+
+@keyframes eggExplode {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.3); opacity: 0.5; }
+  100% { transform: scale(0); opacity: 0; }
+}
+
+/* ========================================
+   殻の破片
+   ======================================== */
+
+.egg-shell-piece {
+  position: absolute;
+  width: 16px;
+  height: 20px;
+  background: linear-gradient(135deg, #FFECD2, #FCE4B8);
+  border: 2px solid #E8C97A;
+  border-radius: 30% 70% 50% 50%;
+  animation: shellFly 0.8s ease-out forwards;
+}
+
+@keyframes shellFly {
+  0% {
+    transform: translate(0, 0) rotate(0deg) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--tx), var(--ty)) rotate(360deg) scale(0.3);
+    opacity: 0;
+  }
+}
+
+/* ========================================
+   フラッシュ
+   ======================================== */
+
+.dino-flash {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: white;
+  opacity: 0;
+  z-index: 20;
+  pointer-events: none;
+}
+
+.dino-flash.active {
+  animation: flashBang 0.4s ease-out;
+}
+
+@keyframes flashBang {
+  0% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* ========================================
+   恐竜登場
+   ======================================== */
+
+.dino-reveal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  animation: dinoRevealPop 0.6s cubic-bezier(0.17, 0.89, 0.32, 1.5);
+  position: relative;
+}
+
+@keyframes dinoRevealPop {
+  0% { transform: scale(0); opacity: 0; }
+  60% { transform: scale(1.15); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.dino-icon {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: 5px solid;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: iconBounce 1s ease-in-out infinite;
+}
+
+@keyframes iconBounce {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-30px); }
+  50% { transform: translateY(-8px); }
 }
 
-.speech-bubble.show {
-  animation: bubblePop 0.5s ease-out forwards;
+.dino-emoji {
+  font-size: 3.5em;
 }
 
-@keyframes bubblePop {
-  from { opacity: 0; transform: translateX(-50%) scale(0); }
-  60% { transform: translateX(-50%) scale(1.1); }
-  to { opacity: 1; transform: translateX(-50%) scale(1); }
+.dino-img {
+  width: 90px;
+  height: 90px;
+  object-fit: contain;
 }
 
-/* 紙吹雪（おうえん用） */
-.anim-confetti {
-  position: absolute;
-  width: 10px; height: 10px;
-  top: -10px;
-  animation: confettiAnim 2.5s ease-in forwards;
-}
-
-@keyframes confettiAnim {
-  0% { transform: translateY(0) rotate(0deg); opacity: 1; }
-  100% { transform: translateY(350px) rotate(720deg); opacity: 0; }
-}
-
-/* ========================================
-   パターン2: ばんざい
-   ======================================== */
-.anim-banzai .block-kun {
-  left: calc(50% - 130px);
-  opacity: 0;
-  animation: popIn 0.6s ease-out forwards;
-}
-
-.anim-banzai .cube-chan {
-  right: calc(50% - 130px);
-  opacity: 0;
-  animation: popIn 0.6s ease-out 0.2s forwards;
-}
-
-@keyframes popIn {
-  from { opacity: 0; transform: scale(0); }
-  60% { transform: scale(1.1); }
-  to { opacity: 1; transform: scale(1); }
-}
-
-.anim-banzai .block-kun.banzai .arm-left,
-.anim-banzai .block-kun.banzai .arm-right {
-  animation: armsUp 0.4s ease-out forwards;
-}
-
-.anim-banzai .cube-chan.banzai .arm-left,
-.anim-banzai .cube-chan.banzai .arm-right {
-  animation: armsUp 0.4s ease-out forwards;
-}
-
-@keyframes armsUp {
-  from { transform: translateY(0); }
-  to { transform: translateY(-25px); }
-}
-
-/* 星エフェクト */
-.star-effect {
-  position: absolute;
-  font-size: 1.5em;
-  color: #FFD93D;
-  animation: starFloat 1.5s ease-out forwards;
-}
-
-@keyframes starFloat {
-  0% { opacity: 1; transform: scale(0) translateY(0); }
-  50% { opacity: 1; transform: scale(1.2) translateY(-40px); }
-  100% { opacity: 0; transform: scale(0.8) translateY(-80px); }
-}
-
-/* ========================================
-   パターン3: ダンス
-   ======================================== */
-.anim-dance .block-kun {
-  left: calc(50% - 140px);
-  animation: danceSwing 0.6s ease-in-out infinite alternate;
-}
-
-.anim-dance .cube-chan {
-  right: calc(50% - 140px);
-  animation: danceSwing 0.6s ease-in-out 0.3s infinite alternate;
-}
-
-@keyframes danceSwing {
-  0% { transform: translateX(-10px) rotate(-5deg); }
-  100% { transform: translateX(10px) rotate(5deg); }
-}
-
-.anim-dance .block-kun.jump-alt {
-  animation: jumpAlt 0.8s ease-in-out infinite;
-}
-
-.anim-dance .cube-chan.jump-alt {
-  animation: jumpAlt 0.8s ease-in-out 0.4s infinite;
-}
-
-@keyframes jumpAlt {
-  0%, 100% { transform: translateY(0) rotate(0deg); }
-  25% { transform: translateY(-20px) rotate(-5deg); }
-  75% { transform: translateY(-20px) rotate(5deg); }
-}
-
-/* 音符エフェクト */
-.note-effect {
-  position: absolute;
+.dino-name {
   font-size: 1.8em;
-  animation: noteFloat 2s ease-out forwards;
+  font-weight: bold;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-@keyframes noteFloat {
-  0% { opacity: 1; transform: translateY(0) rotate(0deg); }
-  100% { opacity: 0; transform: translateY(-100px) rotate(20deg); }
+.dino-desc {
+  font-size: 1.1em;
+  color: #555;
+  text-align: center;
+  max-width: 280px;
+}
+
+.dino-new-badge {
+  position: absolute;
+  top: -8px;
+  right: -30px;
+  background: #FF6B6B;
+  color: white;
+  font-size: 1em;
+  font-weight: bold;
+  padding: 4px 12px;
+  border-radius: 12px;
+  animation: badgePulse 0.6s ease-in-out infinite alternate;
+  box-shadow: 0 2px 8px rgba(255, 107, 107, 0.5);
+}
+
+@keyframes badgePulse {
+  from { transform: scale(1) rotate(-5deg); }
+  to { transform: scale(1.15) rotate(5deg); }
 }
 
 /* ========================================
-   パターン4: はなまる
+   星と紙吹雪エフェクト
    ======================================== */
-.anim-hanamaru .hanamaru-svg {
+
+.dino-star {
   position: absolute;
-  width: 180px; height: 180px;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
+  font-size: 1.6em;
+  animation: starPop 1.5s ease-out forwards;
+  z-index: 5;
 }
 
-.anim-hanamaru .hanamaru-circle {
-  fill: none;
-  stroke: #FF6B6B;
-  stroke-width: 8;
-  stroke-linecap: round;
-  stroke-dasharray: 500;
-  stroke-dashoffset: 500;
-  animation: drawCircle 1.5s ease-out forwards;
+@keyframes starPop {
+  0% { opacity: 1; transform: scale(0) rotate(0deg); }
+  40% { opacity: 1; transform: scale(1.3) rotate(180deg); }
+  100% { opacity: 0; transform: scale(0.5) rotate(360deg) translateY(-30px); }
 }
 
-.anim-hanamaru .hanamaru-petal {
-  fill: none;
-  stroke: #FFD93D;
-  stroke-width: 5;
-  stroke-linecap: round;
-  stroke-dasharray: 100;
-  stroke-dashoffset: 100;
+.dino-confetti {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  top: -10px;
+  border-radius: 2px;
+  animation: confettiFall 2.5s ease-in forwards;
+  z-index: 5;
 }
 
-.anim-hanamaru .petal-1 { animation: drawPetal 0.5s ease-out 1.2s forwards; }
-.anim-hanamaru .petal-2 { animation: drawPetal 0.5s ease-out 1.4s forwards; }
-.anim-hanamaru .petal-3 { animation: drawPetal 0.5s ease-out 1.6s forwards; }
-.anim-hanamaru .petal-4 { animation: drawPetal 0.5s ease-out 1.8s forwards; }
-.anim-hanamaru .petal-5 { animation: drawPetal 0.5s ease-out 2.0s forwards; }
-.anim-hanamaru .petal-6 { animation: drawPetal 0.5s ease-out 2.2s forwards; }
-
-@keyframes drawCircle {
-  to { stroke-dashoffset: 0; }
-}
-
-@keyframes drawPetal {
-  to { stroke-dashoffset: 0; }
-}
-
-.anim-hanamaru .block-kun {
-  right: 30px;
-  bottom: 30px;
-}
-
-.anim-hanamaru .cube-chan {
-  left: 30px;
-  bottom: 30px;
-}
-
-.anim-hanamaru .clapping .arm-left,
-.anim-hanamaru .clapping .arm-right {
-  animation: clapHands 0.4s ease-in-out infinite alternate;
-}
-
-@keyframes clapHands {
-  from { transform: translateX(0); }
-  to { transform: translateX(5px); }
-}
-
-.anim-hanamaru .clapping .arm-left {
-  animation: clapLeft 0.4s ease-in-out infinite alternate;
-}
-
-.anim-hanamaru .clapping .arm-right {
-  animation: clapRight 0.4s ease-in-out infinite alternate;
-}
-
-@keyframes clapLeft {
-  from { transform: translateX(0); }
-  to { transform: translateX(6px); }
-}
-
-@keyframes clapRight {
-  from { transform: translateX(0); }
-  to { transform: translateX(-6px); }
+@keyframes confettiFall {
+  0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(400px) rotate(720deg); opacity: 0; }
 }
 
 /* ========================================
-   パターン5: くるくる
+   ずかんボタン
    ======================================== */
-.anim-kurukuru .block-kun {
-  left: calc(50% - 130px);
-  animation: spinIn 1s ease-out forwards;
+
+.btn-zukan {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  max-width: 500px;
+  margin: 12px auto 0;
+  padding: 14px 24px;
+  background: linear-gradient(135deg, #2C3E50, #34495E);
+  color: #F1C40F;
+  border: 3px solid #F1C40F;
+  border-radius: 16px;
+  font-size: 1.4em;
+  font-weight: bold;
+  cursor: pointer;
+  min-height: 70px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transition: transform 0.1s;
 }
 
-.anim-kurukuru .cube-chan {
-  right: calc(50% - 130px);
-  animation: spinIn 1s ease-out 0.3s forwards;
+.btn-zukan:active {
+  transform: scale(0.97);
 }
 
-@keyframes spinIn {
-  0% { opacity: 0; transform: scale(0) rotate(720deg); }
-  70% { transform: scale(1.1) rotate(0deg); }
-  100% { opacity: 1; transform: scale(1) rotate(0deg); }
+.btn-zukan-progress {
+  font-size: 0.7em;
+  color: #BDC3C7;
+  font-weight: normal;
 }
 
-.anim-kurukuru .block-kun.pose {
-  animation: poseSwing 1s ease-in-out infinite alternate;
+/* ========================================
+   図鑑画面
+   ======================================== */
+
+.zukan-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(135deg, #0F0C29, #302B63, #24243E);
+  z-index: 300;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
-.anim-kurukuru .cube-chan.pose {
-  animation: poseSwing 1s ease-in-out 0.5s infinite alternate;
+.zukan-overlay.hidden {
+  display: none;
 }
 
-@keyframes poseSwing {
-  from { transform: rotate(-3deg); }
-  to { transform: rotate(3deg); }
+.zukan-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  flex-shrink: 0;
 }
 
-/* 虹アーチ */
-.rainbow-arch {
-  position: absolute;
-  top: 0; left: 50%;
-  transform: translateX(-50%);
-  width: 300px; height: 150px;
-  border-radius: 150px 150px 0 0;
-  border: 16px solid transparent;
-  border-bottom: none;
-  opacity: 0;
-  animation: rainbowAppear 1s ease-out 1s forwards;
-  background:
-    linear-gradient(transparent, transparent) padding-box,
-    linear-gradient(90deg, #FF6B6B, #FFD93D, #77DD77, #74C0FC, #A29BFE, #FF9FF3) border-box;
+.zukan-title {
+  font-size: 1.6em;
+  font-weight: bold;
+  color: #F1C40F;
 }
 
-@keyframes rainbowAppear {
-  from { opacity: 0; transform: translateX(-50%) scale(0.5); }
-  to { opacity: 0.6; transform: translateX(-50%) scale(1); }
+.zukan-progress-badge {
+  font-size: 1em;
+  color: #BDC3C7;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 6px 14px;
+  border-radius: 20px;
+}
+
+.zukan-close-btn {
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 10px 20px;
+  font-size: 1.1em;
+  cursor: pointer;
+  min-height: 50px;
+}
+
+.zukan-close-btn:active {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* 図鑑グリッド */
+.zukan-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 14px;
+  padding: 10px 20px 30px;
+  flex: 1;
+}
+
+/* 図鑑カード */
+.zukan-card {
+  background: rgba(255, 255, 255, 0.08);
+  border: 3px solid rgba(255, 255, 255, 0.15);
+  border-radius: 16px;
+  padding: 14px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  cursor: default;
+  transition: transform 0.15s;
+  min-height: 140px;
+}
+
+.zukan-card.owned {
+  background: rgba(255, 255, 255, 0.12);
+  cursor: pointer;
+}
+
+.zukan-card.owned:active {
+  transform: scale(0.96);
+}
+
+.zukan-card.locked {
+  opacity: 0.5;
+}
+
+.zukan-card-icon {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.zukan-card-emoji {
+  font-size: 2.2em;
+}
+
+.locked-emoji {
+  font-size: 2.2em;
+  color: #666;
+}
+
+.zukan-card-name {
+  font-size: 0.85em;
+  color: white;
+  text-align: center;
+  font-weight: bold;
+}
+
+.zukan-card-char {
+  font-size: 0.8em;
+  color: #F1C40F;
+  background: rgba(241, 196, 15, 0.15);
+  padding: 2px 10px;
+  border-radius: 10px;
+}
+
+/* ========================================
+   図鑑詳細ポップアップ
+   ======================================== */
+
+.zukan-detail-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 400;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.zukan-detail-overlay.hidden {
+  display: none;
+}
+
+.zukan-detail-card {
+  background: white;
+  border: 4px solid;
+  border-radius: 24px;
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  max-width: 320px;
+  width: 100%;
+  animation: detailPop 0.4s ease-out;
+}
+
+@keyframes detailPop {
+  0% { transform: scale(0); opacity: 0; }
+  60% { transform: scale(1.05); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.zukan-detail-icon {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.zukan-detail-emoji {
+  font-size: 3em;
+}
+
+.zukan-detail-char {
+  font-size: 1.2em;
+  font-weight: bold;
+}
+
+.zukan-detail-name {
+  font-size: 1.6em;
+  font-weight: bold;
+  color: #333;
+}
+
+.zukan-detail-desc {
+  font-size: 1.1em;
+  color: #555;
+  text-align: center;
+  line-height: 1.6;
+}
+
+.zukan-detail-close-btn {
+  margin-top: 8px;
+  background: #34495E;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 40px;
+  font-size: 1.2em;
+  cursor: pointer;
+  min-height: 50px;
+}
+
+.zukan-detail-close-btn:active {
+  background: #2C3E50;
 }
 
 /* ========================================
@@ -568,28 +604,51 @@
 /* スマホ縦向き */
 @media (max-width: 420px) {
   .animation-stage {
-    height: 220px;
+    height: 260px;
   }
 
-  .block-kun .head { width: 48px; height: 48px; }
-  .block-kun .body { width: 40px; height: 32px; }
-  .block-kun .arm-left,
-  .block-kun .arm-right { width: 11px; height: 24px; top: 52px; }
-  .block-kun .leg-left,
-  .block-kun .leg-right { width: 14px; height: 16px; }
-  .block-kun { width: 72px; }
+  .egg-body {
+    width: 80px;
+    height: 104px;
+  }
 
-  .cube-chan .head { width: 42px; height: 42px; }
-  .cube-chan .body { width: 36px; height: 28px; }
-  .cube-chan .arm-left,
-  .cube-chan .arm-right { width: 10px; height: 20px; top: 46px; }
-  .cube-chan .leg-left,
-  .cube-chan .leg-right { width: 13px; height: 14px; }
-  .cube-chan { width: 64px; }
+  .dino-icon {
+    width: 90px;
+    height: 90px;
+  }
 
-  .speech-bubble { font-size: 1em; padding: 8px 12px; }
+  .dino-emoji { font-size: 2.5em; }
+  .dino-name { font-size: 1.4em; }
+  .dino-desc { font-size: 0.95em; }
   .animation-title { font-size: 1.5em; }
-  .rainbow-arch { width: 200px; height: 100px; }
+
+  .btn-zukan {
+    font-size: 1.2em;
+    min-height: 60px;
+    padding: 12px 20px;
+  }
+
+  .zukan-grid {
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 10px;
+    padding: 10px 12px 24px;
+  }
+
+  .zukan-card {
+    padding: 10px 6px;
+    min-height: 120px;
+  }
+
+  .zukan-card-icon {
+    width: 56px;
+    height: 56px;
+  }
+
+  .zukan-card-emoji { font-size: 1.8em; }
+  .locked-emoji { font-size: 1.8em; }
+  .zukan-card-name { font-size: 0.75em; }
+
+  .zukan-title { font-size: 1.3em; }
 }
 
 /* スマホ横向き */
@@ -605,7 +664,7 @@
   }
 
   .animation-stage {
-    height: 200px;
+    height: 220px;
     flex-shrink: 1;
   }
 
@@ -618,33 +677,67 @@
     font-size: 1.1em;
   }
 
-  .block-kun .head { width: 44px; height: 44px; }
-  .block-kun .body { width: 36px; height: 28px; }
-  .block-kun .arm-left,
-  .block-kun .arm-right { width: 10px; height: 22px; top: 48px; }
-  .block-kun .leg-left,
-  .block-kun .leg-right { width: 13px; height: 14px; }
-  .block-kun { width: 66px; }
+  .egg-body {
+    width: 70px;
+    height: 91px;
+  }
 
-  .cube-chan .head { width: 38px; height: 38px; }
-  .cube-chan .body { width: 32px; height: 24px; }
-  .cube-chan .arm-left,
-  .cube-chan .arm-right { width: 9px; height: 18px; top: 42px; }
-  .cube-chan .leg-left,
-  .cube-chan .leg-right { width: 12px; height: 12px; }
-  .cube-chan { width: 58px; }
+  .dino-icon {
+    width: 80px;
+    height: 80px;
+  }
 
-  .speech-bubble { font-size: 0.9em; padding: 6px 10px; }
-  .rainbow-arch { width: 180px; height: 90px; border-width: 12px; }
+  .dino-emoji { font-size: 2.2em; }
+  .dino-name { font-size: 1.3em; }
+  .dino-desc { font-size: 0.9em; }
+
+  .zukan-header { padding: 10px 16px; }
+  .zukan-title { font-size: 1.2em; }
+  .zukan-grid {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 8px;
+    padding: 6px 12px 16px;
+  }
+  .zukan-card { padding: 8px 4px; min-height: 100px; }
+  .zukan-card-icon { width: 48px; height: 48px; }
+  .zukan-card-emoji { font-size: 1.6em; }
+  .locked-emoji { font-size: 1.6em; }
 }
 
 /* iPad横向き */
 @media (min-width: 768px) and (orientation: landscape) {
   .animation-stage {
-    height: 350px;
+    height: 370px;
     max-width: 700px;
   }
 
   .animation-title { font-size: 2.5em; }
-  .speech-bubble { font-size: 1.6em; }
+
+  .dino-icon {
+    width: 140px;
+    height: 140px;
+  }
+
+  .dino-emoji { font-size: 4em; }
+  .dino-name { font-size: 2.2em; }
+  .dino-desc { font-size: 1.3em; max-width: 350px; }
+
+  .zukan-grid {
+    grid-template-columns: repeat(5, 1fr);
+    gap: 16px;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 16px 24px 30px;
+  }
+
+  .zukan-card {
+    min-height: 160px;
+  }
+
+  .zukan-card-icon {
+    width: 80px;
+    height: 80px;
+  }
+
+  .zukan-card-emoji { font-size: 2.5em; }
 }

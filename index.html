@@ -28,6 +28,8 @@
             <p id="progress-text" class="progress-text"></p>
         </div>
         <div id="char-grid" class="char-grid"></div>
+        <!-- ずかんボタン -->
+        <button id="btn-zukan" class="btn-zukan">🦖 ずかん <span class="btn-zukan-progress" id="zukan-btn-progress"></span></button>
         <!-- 設定ボタン -->
         <button id="btn-settings" class="btn-settings">⚙ せってい</button>
     </div>
@@ -86,6 +88,19 @@
         </div>
     </div>
 
+    <!-- ずかん画面 -->
+    <div id="zukan-overlay" class="zukan-overlay hidden">
+        <div class="zukan-header">
+            <div class="zukan-title">きょうりゅう ずかん</div>
+            <div id="zukan-progress" class="zukan-progress-badge">0 / 10 たい</div>
+            <button id="btn-zukan-close" class="zukan-close-btn">✕ とじる</button>
+        </div>
+        <div id="zukan-grid" class="zukan-grid"></div>
+    </div>
+
+    <!-- ずかん詳細 -->
+    <div id="zukan-detail" class="zukan-detail-overlay hidden"></div>
+
     <!-- パスコード入力画面 -->
     <div id="passcode-screen" class="passcode-screen hidden">
         <div class="passcode-dialog">
@@ -131,8 +146,8 @@
                     </div>
                 </section>
 
-                <!-- ごほうびの種類 -->
-                <section class="settings-section">
+                <!-- ごほうびの種類（恐竜ずかん実装により非表示） -->
+                <section class="settings-section" style="display:none;">
                     <h3>ごほうびの しゅるい</h3>
                     <div class="setting-row">
                         <select id="reward-type" class="setting-select reward-type-select">
@@ -155,13 +170,13 @@
                     <div class="setting-row">
                         <label for="required-clears">
                             <select id="required-clears" class="setting-select"></select>
-                            文字なぞったら1動画
+                            文字なぞったら ごほうび
                         </label>
                     </div>
                 </section>
 
-                <!-- 1日の動画上限 -->
-                <section class="settings-section">
+                <!-- 1日の動画上限（恐竜ずかん実装により非表示） -->
+                <section class="settings-section" style="display:none;">
                     <h3>1日の動画上限</h3>
                     <div class="setting-row">
                         <label for="daily-limit">
@@ -172,8 +187,8 @@
                     </div>
                 </section>
 
-                <!-- ごほうび動画リスト -->
-                <section class="settings-section">
+                <!-- ごほうび動画リスト（恐竜ずかん実装により非表示） -->
+                <section class="settings-section" style="display:none;">
                     <h3>ごほうび動画リスト</h3>
                     <div id="video-list" class="video-list"></div>
                     <div class="video-add-form">
@@ -225,6 +240,7 @@
     <script src="js/hiragana.js"></script>
     <script src="js/canvas.js"></script>
     <script src="js/youtube.js"></script>
+    <script src="js/zukan.js"></script>
     <script src="js/animation.js"></script>
     <script src="js/app.js"></script>
 
