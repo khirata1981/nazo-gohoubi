@@ -45,6 +45,10 @@ const App = {
     document.getElementById("btn-close-video").addEventListener("click", () => YouTube.stop());
     document.getElementById("btn-limit-ok").addEventListener("click", () => this.showSelectScreen());
 
+    // ずかんボタン
+    document.getElementById("btn-zukan").addEventListener("click", () => Zukan.renderZukanScreen());
+    document.getElementById("btn-zukan-close").addEventListener("click", () => Zukan.hideZukanScreen());
+
     // 設定ボタン
     document.getElementById("btn-settings").addEventListener("click", () => SettingsUI.showPasscode());
 
@@ -86,6 +90,15 @@ const App = {
 
     this.renderCharGrid();
     this.updateProgress();
+    this.updateZukanButton();
+  },
+
+  updateZukanButton() {
+    const p = Zukan.getProgress();
+    const el = document.getElementById("zukan-btn-progress");
+    if (el) {
+      el.textContent = `(${p.collected}/${p.total})`;
+    }
   },
 
   renderCharGrid() {
@@ -202,27 +215,7 @@ const App = {
 
     // ごほうび条件を満たしたか
     if (this.sessionClears >= Settings.requiredClears) {
-      const rewardType = Settings.rewardType;
-
-      if (rewardType === "animation") {
-        // アニメーションのみ: 動画上限不要
-        this.showRewardScreen();
-      } else if (rewardType === "youtube") {
-        // YouTube動画のみ: 動画上限チェック
-        if (Settings.canPlayVideo()) {
-          this.showRewardScreen();
-        } else {
-          this.showLimitScreen();
-        }
-      } else {
-        // "both": 動画上限チェックするが、アニメーションが選ばれる可能性もある
-        if (Settings.canPlayVideo()) {
-          this.showRewardScreen();
-        } else {
-          // 動画上限に達していてもアニメーションは再生可能
-          this.playAnimation();
-        }
-      }
+      this.playAnimation();
     } else {
       this.showClearOverlay();
     }
@@ -729,6 +722,9 @@ const SettingsUI = {
     App.clearedChars.clear();
     App.sessionClears = 0;
     localStorage.removeItem("nazo-gohoubi-cleared");
+
+    // ずかんデータをリセット
+    Zukan.reset();
 
     // 今日の動画再生回数をリセット
     Settings.todayVideoCount = 0;

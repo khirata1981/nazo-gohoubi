@@ -1,5 +1,5 @@
 // ========================================
-// ごほうびアニメーション
+// ごほうびアニメーション（恐竜ゲット演出）
 // ========================================
 
 const RewardAnimation = {
@@ -10,64 +10,14 @@ const RewardAnimation = {
   animationTimer: null,
   effectTimers: [],
 
-  // 5つのアニメーションパターン
-  patterns: ["ouen", "banzai", "dance", "hanamaru", "kurukuru"],
-
-  // --- DOM生成ヘルパー ---
-  createBlockKun() {
-    const el = document.createElement("div");
-    el.className = "block-kun";
-    el.innerHTML = `
-      <div class="head">
-        <div class="eye-left"></div>
-        <div class="eye-right"></div>
-        <div class="mouth"></div>
-      </div>
-      <div class="body"></div>
-      <div class="arm-left"></div>
-      <div class="arm-right"></div>
-      <div class="leg-left"></div>
-      <div class="leg-right"></div>
-    `;
-    return el;
-  },
-
-  createCubeChan() {
-    const el = document.createElement("div");
-    el.className = "cube-chan";
-    el.innerHTML = `
-      <div class="head">
-        <div class="ribbon"></div>
-        <div class="eye-left"></div>
-        <div class="eye-right"></div>
-        <div class="cheek-left"></div>
-        <div class="cheek-right"></div>
-        <div class="mouth"></div>
-      </div>
-      <div class="body"></div>
-      <div class="arm-left"></div>
-      <div class="arm-right"></div>
-      <div class="leg-left"></div>
-      <div class="leg-right"></div>
-    `;
-    return el;
-  },
-
-  createSpeechBubble(text) {
-    const el = document.createElement("div");
-    el.className = "speech-bubble";
-    el.textContent = text;
-    return el;
-  },
-
   // --- メイン制御 ---
   play(onFinish) {
     this.onFinish = onFinish;
-    const pattern = this.patterns[Math.floor(Math.random() * this.patterns.length)];
-    this.showOverlay(pattern);
+    const result = Zukan.collectForReward();
+    this.showOverlay(result);
   },
 
-  showOverlay(pattern) {
+  showOverlay(result) {
     this.overlay = document.getElementById("animation-overlay");
     this.stage = document.getElementById("animation-stage");
     this.titleEl = document.getElementById("animation-title");
@@ -80,21 +30,177 @@ const RewardAnimation = {
     this.clearTimers();
 
     // タイトル
-    this.titleEl.textContent = "★ よくできました！ ★";
-
-    // パターン別に演出を実行
-    this.stage.classList.add(`anim-${pattern}`);
-    this[`play_${pattern}`]();
+    this.titleEl.textContent = result.isNew ? "★ たまご はっけん！ ★" : "★ また あえたね！ ★";
 
     // オーバーレイ表示
     this.overlay.classList.remove("hidden");
 
-    // ボタンを表示（アニメーション終了後）
+    // フラッシュ用要素
+    const flash = document.createElement("div");
+    flash.className = "dino-flash";
+    this.stage.appendChild(flash);
+
+    // --- フェーズ1: 卵が震える (0〜1.5秒) ---
+    const egg = this.createEgg();
+    this.stage.appendChild(egg);
+
+    this.effectTimers.push(setTimeout(() => {
+      egg.classList.add("shaking");
+    }, 300));
+
+    // --- フェーズ2: ヒビ＋激しく震え (1.5〜2.5秒) ---
+    this.effectTimers.push(setTimeout(() => {
+      egg.classList.remove("shaking");
+      egg.classList.add("shaking-hard");
+      // ヒビを追加
+      const crack1 = document.createElement("div");
+      crack1.className = "egg-crack crack-1";
+      egg.querySelector(".egg-body").appendChild(crack1);
+    }, 1500));
+
+    this.effectTimers.push(setTimeout(() => {
+      const crack2 = document.createElement("div");
+      crack2.className = "egg-crack crack-2";
+      egg.querySelector(".egg-body").appendChild(crack2);
+    }, 2000));
+
+    // --- フェーズ3: フラッシュ＋卵割れる＋殻飛散 (2.5秒) ---
+    this.effectTimers.push(setTimeout(() => {
+      // フラッシュ
+      flash.classList.add("active");
+      this.effectTimers.push(setTimeout(() => flash.classList.remove("active"), 400));
+
+      // 卵を割る
+      egg.classList.remove("shaking-hard");
+      egg.classList.add("explode");
+
+      // 殻の破片を生成
+      this.spawnShellPieces(8);
+    }, 2500));
+
+    // --- フェーズ4: 恐竜ドーン！(2.9秒〜) ---
+    this.effectTimers.push(setTimeout(() => {
+      egg.style.display = "none";
+      this.showDinoReveal(result);
+    }, 2900));
+
+    // --- フェーズ5: 星と紙吹雪 (3.2秒) ---
+    this.effectTimers.push(setTimeout(() => {
+      this.spawnStarsAndConfetti();
+    }, 3200));
+
+    // --- フェーズ6: ボタン表示 (4.5秒) ---
     this.animationTimer = setTimeout(() => {
       this.buttonsEl.classList.add("visible");
-    }, 5500);
+    }, 4500);
   },
 
+  // --- 卵を生成 ---
+  createEgg() {
+    const egg = document.createElement("div");
+    egg.className = "dino-egg";
+    egg.innerHTML = `
+      <div class="egg-body">
+        <div class="egg-spot spot-1"></div>
+        <div class="egg-spot spot-2"></div>
+        <div class="egg-spot spot-3"></div>
+      </div>
+    `;
+    return egg;
+  },
+
+  // --- 殻の破片 ---
+  spawnShellPieces(count) {
+    for (let i = 0; i < count; i++) {
+      const piece = document.createElement("div");
+      piece.className = "egg-shell-piece";
+      const angle = (i / count) * 360;
+      const distance = 80 + Math.random() * 60;
+      const tx = Math.cos(angle * Math.PI / 180) * distance;
+      const ty = Math.sin(angle * Math.PI / 180) * distance - 40;
+      piece.style.setProperty("--tx", `${tx}px`);
+      piece.style.setProperty("--ty", `${ty}px`);
+      piece.style.left = "50%";
+      piece.style.top = "50%";
+      this.stage.appendChild(piece);
+    }
+  },
+
+  // --- 恐竜登場 ---
+  showDinoReveal(result) {
+    const reveal = document.createElement("div");
+    reveal.className = "dino-reveal";
+
+    const icon = document.createElement("div");
+    icon.className = "dino-icon";
+    icon.style.background = `${result.dino.color}20`;
+    icon.style.borderColor = result.dino.color;
+
+    if (result.dino.img) {
+      const img = document.createElement("img");
+      img.src = result.dino.img;
+      img.alt = result.dino.name;
+      img.className = "dino-img";
+      icon.appendChild(img);
+    } else {
+      const emoji = document.createElement("span");
+      emoji.className = "dino-emoji";
+      emoji.textContent = result.dino.emoji;
+      icon.appendChild(emoji);
+    }
+
+    const name = document.createElement("div");
+    name.className = "dino-name";
+    name.style.color = result.dino.color;
+    name.textContent = result.dino.name;
+
+    const desc = document.createElement("div");
+    desc.className = "dino-desc";
+    desc.textContent = result.dino.desc;
+
+    reveal.appendChild(icon);
+
+    if (result.isNew) {
+      const badge = document.createElement("div");
+      badge.className = "dino-new-badge";
+      badge.textContent = "NEW!";
+      reveal.appendChild(badge);
+    }
+
+    reveal.appendChild(name);
+    reveal.appendChild(desc);
+
+    this.stage.appendChild(reveal);
+  },
+
+  // --- 星と紙吹雪 ---
+  spawnStarsAndConfetti() {
+    // 星
+    for (let i = 0; i < 10; i++) {
+      const star = document.createElement("div");
+      star.className = "dino-star";
+      star.textContent = "★";
+      star.style.left = `${10 + Math.random() * 80}%`;
+      star.style.top = `${10 + Math.random() * 60}%`;
+      star.style.animationDelay = `${Math.random() * 0.5}s`;
+      star.style.color = ["#FFD93D", "#FFB347", "#FF6B6B"][Math.floor(Math.random() * 3)];
+      this.stage.appendChild(star);
+    }
+
+    // 紙吹雪
+    const colors = ["#FF6B6B", "#FFD93D", "#74C0FC", "#77DD77", "#FFB347", "#FF9FF3", "#A29BFE"];
+    for (let i = 0; i < 25; i++) {
+      const conf = document.createElement("div");
+      conf.className = "dino-confetti";
+      conf.style.left = `${Math.random() * 100}%`;
+      conf.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+      conf.style.animationDelay = `${Math.random() * 0.8}s`;
+      conf.style.animationDuration = `${1.5 + Math.random() * 1.5}s`;
+      this.stage.appendChild(conf);
+    }
+  },
+
+  // --- 表示を閉じる ---
   hide() {
     this.clearTimers();
     if (this.overlay) {
@@ -112,265 +218,7 @@ const RewardAnimation = {
       clearTimeout(this.animationTimer);
       this.animationTimer = null;
     }
-    this.effectTimers.forEach((t) => clearTimeout(t));
+    this.effectTimers.forEach(t => clearTimeout(t));
     this.effectTimers = [];
-  },
-
-  getChildName() {
-    return Settings.childName || "さくやくん";
-  },
-
-  // ========================================
-  // パターン1: おうえん
-  // ========================================
-  play_ouen() {
-    const blockKun = this.createBlockKun();
-    const cubeChan = this.createCubeChan();
-    const bubble = this.createSpeechBubble(`${this.getChildName()} すごいね！`);
-
-    this.stage.appendChild(blockKun);
-    this.stage.appendChild(cubeChan);
-    this.stage.appendChild(bubble);
-
-    // スライドイン完了後にジャンプ（位置を固定してからアニメ切り替え）
-    this.effectTimers.push(setTimeout(() => {
-      blockKun.style.left = "60px";
-      blockKun.style.animation = "none";
-      // リフローを強制してからジャンプアニメーション適用
-      void blockKun.offsetHeight;
-      blockKun.classList.add("jumping");
-    }, 1000));
-
-    this.effectTimers.push(setTimeout(() => {
-      cubeChan.style.right = "60px";
-      cubeChan.style.animation = "none";
-      void cubeChan.offsetHeight;
-      cubeChan.classList.add("jumping");
-    }, 1300));
-
-    // 1.5秒後に吹き出し表示
-    this.effectTimers.push(setTimeout(() => {
-      bubble.classList.add("show");
-    }, 1500));
-
-    // 2秒後に紙吹雪
-    this.effectTimers.push(setTimeout(() => {
-      this.spawnConfetti(20);
-    }, 2000));
-  },
-
-  // ========================================
-  // パターン2: ばんざい
-  // ========================================
-  play_banzai() {
-    const blockKun = this.createBlockKun();
-    const cubeChan = this.createCubeChan();
-    const bubble = this.createSpeechBubble(`${this.getChildName()} やったね！`);
-
-    this.stage.appendChild(blockKun);
-    this.stage.appendChild(cubeChan);
-    this.stage.appendChild(bubble);
-
-    // popIn完了後にばんざい（popInはforwardsなので位置は維持される）
-    // banzaiクラスは腕だけにアニメーションを追加するので親アニメーションとは衝突しない
-    this.effectTimers.push(setTimeout(() => {
-      blockKun.style.opacity = "1";
-      blockKun.classList.add("banzai");
-      cubeChan.style.opacity = "1";
-      cubeChan.classList.add("banzai");
-    }, 1000));
-
-    // 1.5秒後に吹き出し
-    this.effectTimers.push(setTimeout(() => {
-      bubble.classList.add("show");
-    }, 1500));
-
-    // 2秒後に星エフェクト
-    this.effectTimers.push(setTimeout(() => {
-      this.spawnStars(12);
-    }, 2000));
-
-    // 3.5秒後にもう一回星
-    this.effectTimers.push(setTimeout(() => {
-      this.spawnStars(8);
-    }, 3500));
-  },
-
-  // ========================================
-  // パターン3: ダンス
-  // ========================================
-  play_dance() {
-    const blockKun = this.createBlockKun();
-    const cubeChan = this.createCubeChan();
-    const bubble = this.createSpeechBubble(`${this.getChildName()} かっこいい！`);
-
-    this.stage.appendChild(blockKun);
-    this.stage.appendChild(cubeChan);
-    this.stage.appendChild(bubble);
-
-    // 2秒後にジャンプダンスに切り替え（位置を固定してから）
-    this.effectTimers.push(setTimeout(() => {
-      blockKun.style.left = "calc(50% - 140px)";
-      blockKun.style.animation = "none";
-      void blockKun.offsetHeight;
-      blockKun.classList.add("jump-alt");
-
-      cubeChan.style.right = "calc(50% - 140px)";
-      cubeChan.style.animation = "none";
-      void cubeChan.offsetHeight;
-      cubeChan.classList.add("jump-alt");
-    }, 2000));
-
-    // 2.5秒後に吹き出し
-    this.effectTimers.push(setTimeout(() => {
-      bubble.classList.add("show");
-    }, 2500));
-
-    // 音符を定期的に出す
-    for (let i = 0; i < 6; i++) {
-      this.effectTimers.push(setTimeout(() => {
-        this.spawnNote();
-      }, 1500 + i * 700));
-    }
-  },
-
-  // ========================================
-  // パターン4: はなまる
-  // ========================================
-  play_hanamaru() {
-    // SVGの花丸
-    const svgNS = "http://www.w3.org/2000/svg";
-    const svg = document.createElementNS(svgNS, "svg");
-    svg.setAttribute("class", "hanamaru-svg");
-    svg.setAttribute("viewBox", "0 0 180 180");
-
-    // メインの丸
-    const circle = document.createElementNS(svgNS, "circle");
-    circle.setAttribute("class", "hanamaru-circle");
-    circle.setAttribute("cx", "90");
-    circle.setAttribute("cy", "90");
-    circle.setAttribute("r", "70");
-    svg.appendChild(circle);
-
-    // 花びら（6枚）
-    const petalAngles = [0, 60, 120, 180, 240, 300];
-    petalAngles.forEach((angle, i) => {
-      const rad = (angle * Math.PI) / 180;
-      const x1 = 90 + 68 * Math.cos(rad);
-      const y1 = 90 + 68 * Math.sin(rad);
-      const x2 = 90 + 88 * Math.cos(rad);
-      const y2 = 90 + 88 * Math.sin(rad);
-
-      const petal = document.createElementNS(svgNS, "line");
-      petal.setAttribute("class", `hanamaru-petal petal-${i + 1}`);
-      petal.setAttribute("x1", x1);
-      petal.setAttribute("y1", y1);
-      petal.setAttribute("x2", x2);
-      petal.setAttribute("y2", y2);
-      svg.appendChild(petal);
-    });
-
-    this.stage.appendChild(svg);
-
-    const blockKun = this.createBlockKun();
-    const cubeChan = this.createCubeChan();
-    const bubble = this.createSpeechBubble(`${this.getChildName()} はなまる！`);
-
-    this.stage.appendChild(blockKun);
-    this.stage.appendChild(cubeChan);
-    this.stage.appendChild(bubble);
-
-    // 2.5秒後に拍手
-    this.effectTimers.push(setTimeout(() => {
-      blockKun.classList.add("clapping");
-      cubeChan.classList.add("clapping");
-    }, 2500));
-
-    // 3秒後に吹き出し
-    this.effectTimers.push(setTimeout(() => {
-      bubble.classList.add("show");
-    }, 3000));
-  },
-
-  // ========================================
-  // パターン5: くるくる
-  // ========================================
-  play_kurukuru() {
-    const rainbow = document.createElement("div");
-    rainbow.className = "rainbow-arch";
-    this.stage.appendChild(rainbow);
-
-    const blockKun = this.createBlockKun();
-    const cubeChan = this.createCubeChan();
-    const bubble = this.createSpeechBubble(`${this.getChildName()} てんさい！`);
-
-    this.stage.appendChild(blockKun);
-    this.stage.appendChild(cubeChan);
-    this.stage.appendChild(bubble);
-
-    // スピンイン完了後にポーズ（位置を固定してから）
-    this.effectTimers.push(setTimeout(() => {
-      blockKun.style.left = "calc(50% - 130px)";
-      blockKun.style.opacity = "1";
-      blockKun.style.animation = "none";
-      void blockKun.offsetHeight;
-      blockKun.classList.add("pose");
-    }, 1500));
-
-    this.effectTimers.push(setTimeout(() => {
-      cubeChan.style.right = "calc(50% - 130px)";
-      cubeChan.style.opacity = "1";
-      cubeChan.style.animation = "none";
-      void cubeChan.offsetHeight;
-      cubeChan.classList.add("pose");
-    }, 1800));
-
-    // 2秒後に吹き出し
-    this.effectTimers.push(setTimeout(() => {
-      bubble.classList.add("show");
-    }, 2000));
-  },
-
-  // ========================================
-  // エフェクト生成
-  // ========================================
-  spawnConfetti(count) {
-    const colors = ["#FF6B6B", "#FFD93D", "#74C0FC", "#77DD77", "#FFB347", "#FF9FF3"];
-    for (let i = 0; i < count; i++) {
-      const piece = document.createElement("div");
-      piece.className = "anim-confetti";
-      piece.style.left = `${10 + Math.random() * 80}%`;
-      piece.style.width = `${6 + Math.random() * 8}px`;
-      piece.style.height = piece.style.width;
-      piece.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-      piece.style.animationDelay = `${Math.random() * 1}s`;
-      piece.style.animationDuration = `${2 + Math.random() * 1.5}s`;
-      piece.style.borderRadius = Math.random() > 0.5 ? "50%" : "0";
-      this.stage.appendChild(piece);
-    }
-  },
-
-  spawnStars(count) {
-    for (let i = 0; i < count; i++) {
-      const star = document.createElement("div");
-      star.className = "star-effect";
-      star.textContent = "★";
-      star.style.left = `${10 + Math.random() * 80}%`;
-      star.style.top = `${30 + Math.random() * 50}%`;
-      star.style.animationDelay = `${Math.random() * 0.8}s`;
-      star.style.color = Math.random() > 0.5 ? "#FFD93D" : "#FFB347";
-      this.stage.appendChild(star);
-    }
-  },
-
-  spawnNote() {
-    const notes = ["♪", "♫", "♬"];
-    const note = document.createElement("div");
-    note.className = "note-effect";
-    note.textContent = notes[Math.floor(Math.random() * notes.length)];
-    note.style.left = `${20 + Math.random() * 60}%`;
-    note.style.top = `${40 + Math.random() * 40}%`;
-    note.style.color = ["#FF6B6B", "#74C0FC", "#FFD93D", "#77DD77"][Math.floor(Math.random() * 4)];
-    this.stage.appendChild(note);
   },
 };

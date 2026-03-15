@@ -1,5 +1,5 @@
 // Service Worker - なぞって ごほうび！
-const CACHE_NAME = "nazo-gohoubi-v2";
+const CACHE_NAME = "nazo-gohoubi-v3";
 const ASSETS_TO_CACHE = [
   "./",
   "./index.html",
@@ -9,6 +9,7 @@ const ASSETS_TO_CACHE = [
   "./js/canvas.js",
   "./js/hiragana.js",
   "./js/youtube.js",
+  "./js/zukan.js",
   "./js/settings.js",
   "./js/animation.js",
   "./icons/icon-192.png",
