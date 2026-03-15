@@ -1,0 +1,650 @@
+/* ========================================
+   キャラクター & ごほうびアニメーション
+   ======================================== */
+
+/* --- アニメーションオーバーレイ --- */
+.animation-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: #FFFEF5;
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.animation-overlay.hidden {
+  display: none;
+}
+
+.animation-title {
+  font-size: 2em;
+  font-weight: bold;
+  color: #FF6B6B;
+  margin-bottom: 10px;
+  text-align: center;
+  animation: titleBounce 0.6s ease-out;
+  flex-shrink: 0;
+}
+
+@keyframes titleBounce {
+  0% { transform: scale(0); opacity: 0; }
+  60% { transform: scale(1.2); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* --- アニメーションステージ --- */
+.animation-stage {
+  position: relative;
+  width: 100%;
+  max-width: 600px;
+  height: 280px;
+  flex-shrink: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+}
+
+/* --- ブロックくん（水色） --- */
+.block-kun {
+  position: absolute;
+  width: 90px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.block-kun .head {
+  width: 60px; height: 60px;
+  background: #74C0FC;
+  border: 3px solid #4AA3E0;
+  position: relative;
+}
+
+.block-kun .eye-left,
+.block-kun .eye-right {
+  position: absolute;
+  width: 10px; height: 10px;
+  background: #333;
+  top: 20px;
+}
+.block-kun .eye-left { left: 14px; }
+.block-kun .eye-right { right: 14px; }
+
+.block-kun .mouth {
+  position: absolute;
+  width: 12px; height: 6px;
+  background: #333;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.block-kun .body {
+  width: 50px; height: 40px;
+  background: #5BAEE0;
+  border: 3px solid #4AA3E0;
+  margin-top: -3px;
+}
+
+.block-kun .arm-left,
+.block-kun .arm-right {
+  position: absolute;
+  width: 14px; height: 30px;
+  background: #74C0FC;
+  border: 2px solid #4AA3E0;
+  top: 65px;
+}
+.block-kun .arm-left { left: 0; }
+.block-kun .arm-right { right: 0; }
+
+.block-kun .leg-left,
+.block-kun .leg-right {
+  position: absolute;
+  width: 18px; height: 20px;
+  background: #5BAEE0;
+  border: 2px solid #4AA3E0;
+  bottom: 0;
+}
+.block-kun .leg-left { left: 14px; }
+.block-kun .leg-right { right: 14px; }
+
+/* --- キューブちゃん（ピンク） --- */
+.cube-chan {
+  position: absolute;
+  width: 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.cube-chan .head {
+  width: 52px; height: 52px;
+  background: #FF9FF3;
+  border: 3px solid #E07BC0;
+  position: relative;
+}
+
+.cube-chan .ribbon {
+  position: absolute;
+  top: -14px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 24px; height: 12px;
+  background: #FF6B6B;
+  border: 2px solid #E04E4E;
+}
+.cube-chan .ribbon::before,
+.cube-chan .ribbon::after {
+  content: "";
+  position: absolute;
+  width: 10px; height: 10px;
+  background: #FF6B6B;
+  border: 2px solid #E04E4E;
+  top: -2px;
+}
+.cube-chan .ribbon::before { left: -10px; }
+.cube-chan .ribbon::after { right: -10px; }
+
+.cube-chan .eye-left,
+.cube-chan .eye-right {
+  position: absolute;
+  width: 9px; height: 9px;
+  background: #333;
+  top: 18px;
+}
+.cube-chan .eye-left { left: 11px; }
+.cube-chan .eye-right { right: 11px; }
+
+.cube-chan .cheek-left,
+.cube-chan .cheek-right {
+  position: absolute;
+  width: 8px; height: 6px;
+  background: #FF6B6B;
+  opacity: 0.6;
+  top: 30px;
+}
+.cube-chan .cheek-left { left: 6px; }
+.cube-chan .cheek-right { right: 6px; }
+
+.cube-chan .mouth {
+  position: absolute;
+  width: 8px; height: 4px;
+  background: #333;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.cube-chan .body {
+  width: 44px; height: 35px;
+  background: #FFB8E8;
+  border: 3px solid #E07BC0;
+  margin-top: -3px;
+}
+
+.cube-chan .arm-left,
+.cube-chan .arm-right {
+  position: absolute;
+  width: 12px; height: 26px;
+  background: #FF9FF3;
+  border: 2px solid #E07BC0;
+  top: 57px;
+}
+.cube-chan .arm-left { left: 0; }
+.cube-chan .arm-right { right: 0; }
+
+.cube-chan .leg-left,
+.cube-chan .leg-right {
+  position: absolute;
+  width: 16px; height: 18px;
+  background: #FFB8E8;
+  border: 2px solid #E07BC0;
+  bottom: 0;
+}
+.cube-chan .leg-left { left: 12px; }
+.cube-chan .leg-right { right: 12px; }
+
+/* --- 吹き出し --- */
+.speech-bubble {
+  position: absolute;
+  background: white;
+  border: 3px solid #FFD93D;
+  border-radius: 16px;
+  padding: 12px 20px;
+  font-size: 1.4em;
+  font-weight: bold;
+  color: #333;
+  white-space: nowrap;
+  opacity: 0;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.speech-bubble::after {
+  content: "";
+  position: absolute;
+  bottom: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0; height: 0;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-top: 12px solid white;
+}
+
+.speech-bubble::before {
+  content: "";
+  position: absolute;
+  bottom: -16px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0; height: 0;
+  border-left: 12px solid transparent;
+  border-right: 12px solid transparent;
+  border-top: 14px solid #FFD93D;
+}
+
+/* --- アニメーション後のボタン --- */
+.animation-buttons {
+  margin-top: 10px;
+  display: flex;
+  gap: 16px;
+  flex-wrap: nowrap;
+  justify-content: center;
+  opacity: 0;
+  flex-shrink: 0;
+}
+
+.animation-buttons.visible {
+  opacity: 1;
+  animation: fadeInUp 0.5s ease-out;
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ========================================
+   パターン1: おうえん
+   ======================================== */
+.anim-ouen .block-kun {
+  left: -100px;
+  animation: slideInLeft 0.8s ease-out forwards;
+}
+
+.anim-ouen .cube-chan {
+  right: -100px;
+  animation: slideInRight 0.8s ease-out 0.3s forwards;
+}
+
+@keyframes slideInLeft {
+  from { left: -100px; }
+  to { left: 60px; }
+}
+
+@keyframes slideInRight {
+  from { right: -100px; }
+  to { right: 60px; }
+}
+
+.anim-ouen .block-kun.jumping {
+  animation: jumpBounce 0.5s ease-in-out infinite;
+}
+
+.anim-ouen .cube-chan.jumping {
+  animation: jumpBounce 0.5s ease-in-out 0.25s infinite;
+}
+
+@keyframes jumpBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-30px); }
+}
+
+.speech-bubble.show {
+  animation: bubblePop 0.5s ease-out forwards;
+}
+
+@keyframes bubblePop {
+  from { opacity: 0; transform: translateX(-50%) scale(0); }
+  60% { transform: translateX(-50%) scale(1.1); }
+  to { opacity: 1; transform: translateX(-50%) scale(1); }
+}
+
+/* 紙吹雪（おうえん用） */
+.anim-confetti {
+  position: absolute;
+  width: 10px; height: 10px;
+  top: -10px;
+  animation: confettiAnim 2.5s ease-in forwards;
+}
+
+@keyframes confettiAnim {
+  0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(350px) rotate(720deg); opacity: 0; }
+}
+
+/* ========================================
+   パターン2: ばんざい
+   ======================================== */
+.anim-banzai .block-kun {
+  left: calc(50% - 130px);
+  opacity: 0;
+  animation: popIn 0.6s ease-out forwards;
+}
+
+.anim-banzai .cube-chan {
+  right: calc(50% - 130px);
+  opacity: 0;
+  animation: popIn 0.6s ease-out 0.2s forwards;
+}
+
+@keyframes popIn {
+  from { opacity: 0; transform: scale(0); }
+  60% { transform: scale(1.1); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.anim-banzai .block-kun.banzai .arm-left,
+.anim-banzai .block-kun.banzai .arm-right {
+  animation: armsUp 0.4s ease-out forwards;
+}
+
+.anim-banzai .cube-chan.banzai .arm-left,
+.anim-banzai .cube-chan.banzai .arm-right {
+  animation: armsUp 0.4s ease-out forwards;
+}
+
+@keyframes armsUp {
+  from { transform: translateY(0); }
+  to { transform: translateY(-25px); }
+}
+
+/* 星エフェクト */
+.star-effect {
+  position: absolute;
+  font-size: 1.5em;
+  color: #FFD93D;
+  animation: starFloat 1.5s ease-out forwards;
+}
+
+@keyframes starFloat {
+  0% { opacity: 1; transform: scale(0) translateY(0); }
+  50% { opacity: 1; transform: scale(1.2) translateY(-40px); }
+  100% { opacity: 0; transform: scale(0.8) translateY(-80px); }
+}
+
+/* ========================================
+   パターン3: ダンス
+   ======================================== */
+.anim-dance .block-kun {
+  left: calc(50% - 140px);
+  animation: danceSwing 0.6s ease-in-out infinite alternate;
+}
+
+.anim-dance .cube-chan {
+  right: calc(50% - 140px);
+  animation: danceSwing 0.6s ease-in-out 0.3s infinite alternate;
+}
+
+@keyframes danceSwing {
+  0% { transform: translateX(-10px) rotate(-5deg); }
+  100% { transform: translateX(10px) rotate(5deg); }
+}
+
+.anim-dance .block-kun.jump-alt {
+  animation: jumpAlt 0.8s ease-in-out infinite;
+}
+
+.anim-dance .cube-chan.jump-alt {
+  animation: jumpAlt 0.8s ease-in-out 0.4s infinite;
+}
+
+@keyframes jumpAlt {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  25% { transform: translateY(-20px) rotate(-5deg); }
+  75% { transform: translateY(-20px) rotate(5deg); }
+}
+
+/* 音符エフェクト */
+.note-effect {
+  position: absolute;
+  font-size: 1.8em;
+  animation: noteFloat 2s ease-out forwards;
+}
+
+@keyframes noteFloat {
+  0% { opacity: 1; transform: translateY(0) rotate(0deg); }
+  100% { opacity: 0; transform: translateY(-100px) rotate(20deg); }
+}
+
+/* ========================================
+   パターン4: はなまる
+   ======================================== */
+.anim-hanamaru .hanamaru-svg {
+  position: absolute;
+  width: 180px; height: 180px;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.anim-hanamaru .hanamaru-circle {
+  fill: none;
+  stroke: #FF6B6B;
+  stroke-width: 8;
+  stroke-linecap: round;
+  stroke-dasharray: 500;
+  stroke-dashoffset: 500;
+  animation: drawCircle 1.5s ease-out forwards;
+}
+
+.anim-hanamaru .hanamaru-petal {
+  fill: none;
+  stroke: #FFD93D;
+  stroke-width: 5;
+  stroke-linecap: round;
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+}
+
+.anim-hanamaru .petal-1 { animation: drawPetal 0.5s ease-out 1.2s forwards; }
+.anim-hanamaru .petal-2 { animation: drawPetal 0.5s ease-out 1.4s forwards; }
+.anim-hanamaru .petal-3 { animation: drawPetal 0.5s ease-out 1.6s forwards; }
+.anim-hanamaru .petal-4 { animation: drawPetal 0.5s ease-out 1.8s forwards; }
+.anim-hanamaru .petal-5 { animation: drawPetal 0.5s ease-out 2.0s forwards; }
+.anim-hanamaru .petal-6 { animation: drawPetal 0.5s ease-out 2.2s forwards; }
+
+@keyframes drawCircle {
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes drawPetal {
+  to { stroke-dashoffset: 0; }
+}
+
+.anim-hanamaru .block-kun {
+  right: 30px;
+  bottom: 30px;
+}
+
+.anim-hanamaru .cube-chan {
+  left: 30px;
+  bottom: 30px;
+}
+
+.anim-hanamaru .clapping .arm-left,
+.anim-hanamaru .clapping .arm-right {
+  animation: clapHands 0.4s ease-in-out infinite alternate;
+}
+
+@keyframes clapHands {
+  from { transform: translateX(0); }
+  to { transform: translateX(5px); }
+}
+
+.anim-hanamaru .clapping .arm-left {
+  animation: clapLeft 0.4s ease-in-out infinite alternate;
+}
+
+.anim-hanamaru .clapping .arm-right {
+  animation: clapRight 0.4s ease-in-out infinite alternate;
+}
+
+@keyframes clapLeft {
+  from { transform: translateX(0); }
+  to { transform: translateX(6px); }
+}
+
+@keyframes clapRight {
+  from { transform: translateX(0); }
+  to { transform: translateX(-6px); }
+}
+
+/* ========================================
+   パターン5: くるくる
+   ======================================== */
+.anim-kurukuru .block-kun {
+  left: calc(50% - 130px);
+  animation: spinIn 1s ease-out forwards;
+}
+
+.anim-kurukuru .cube-chan {
+  right: calc(50% - 130px);
+  animation: spinIn 1s ease-out 0.3s forwards;
+}
+
+@keyframes spinIn {
+  0% { opacity: 0; transform: scale(0) rotate(720deg); }
+  70% { transform: scale(1.1) rotate(0deg); }
+  100% { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+
+.anim-kurukuru .block-kun.pose {
+  animation: poseSwing 1s ease-in-out infinite alternate;
+}
+
+.anim-kurukuru .cube-chan.pose {
+  animation: poseSwing 1s ease-in-out 0.5s infinite alternate;
+}
+
+@keyframes poseSwing {
+  from { transform: rotate(-3deg); }
+  to { transform: rotate(3deg); }
+}
+
+/* 虹アーチ */
+.rainbow-arch {
+  position: absolute;
+  top: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 300px; height: 150px;
+  border-radius: 150px 150px 0 0;
+  border: 16px solid transparent;
+  border-bottom: none;
+  opacity: 0;
+  animation: rainbowAppear 1s ease-out 1s forwards;
+  background:
+    linear-gradient(transparent, transparent) padding-box,
+    linear-gradient(90deg, #FF6B6B, #FFD93D, #77DD77, #74C0FC, #A29BFE, #FF9FF3) border-box;
+}
+
+@keyframes rainbowAppear {
+  from { opacity: 0; transform: translateX(-50%) scale(0.5); }
+  to { opacity: 0.6; transform: translateX(-50%) scale(1); }
+}
+
+/* ========================================
+   レスポンシブ
+   ======================================== */
+
+/* スマホ縦向き */
+@media (max-width: 420px) {
+  .animation-stage {
+    height: 220px;
+  }
+
+  .block-kun .head { width: 48px; height: 48px; }
+  .block-kun .body { width: 40px; height: 32px; }
+  .block-kun .arm-left,
+  .block-kun .arm-right { width: 11px; height: 24px; top: 52px; }
+  .block-kun .leg-left,
+  .block-kun .leg-right { width: 14px; height: 16px; }
+  .block-kun { width: 72px; }
+
+  .cube-chan .head { width: 42px; height: 42px; }
+  .cube-chan .body { width: 36px; height: 28px; }
+  .cube-chan .arm-left,
+  .cube-chan .arm-right { width: 10px; height: 20px; top: 46px; }
+  .cube-chan .leg-left,
+  .cube-chan .leg-right { width: 13px; height: 14px; }
+  .cube-chan { width: 64px; }
+
+  .speech-bubble { font-size: 1em; padding: 8px 12px; }
+  .animation-title { font-size: 1.5em; }
+  .rainbow-arch { width: 200px; height: 100px; }
+}
+
+/* スマホ横向き */
+@media (max-height: 500px) and (orientation: landscape) {
+  .animation-overlay {
+    padding: 8px;
+    justify-content: flex-start;
+  }
+
+  .animation-title {
+    font-size: 1.3em;
+    margin-bottom: 4px;
+  }
+
+  .animation-stage {
+    height: 200px;
+    flex-shrink: 1;
+  }
+
+  .animation-buttons {
+    margin-top: 4px;
+  }
+
+  .animation-buttons .btn {
+    min-height: 56px;
+    font-size: 1.1em;
+  }
+
+  .block-kun .head { width: 44px; height: 44px; }
+  .block-kun .body { width: 36px; height: 28px; }
+  .block-kun .arm-left,
+  .block-kun .arm-right { width: 10px; height: 22px; top: 48px; }
+  .block-kun .leg-left,
+  .block-kun .leg-right { width: 13px; height: 14px; }
+  .block-kun { width: 66px; }
+
+  .cube-chan .head { width: 38px; height: 38px; }
+  .cube-chan .body { width: 32px; height: 24px; }
+  .cube-chan .arm-left,
+  .cube-chan .arm-right { width: 9px; height: 18px; top: 42px; }
+  .cube-chan .leg-left,
+  .cube-chan .leg-right { width: 12px; height: 12px; }
+  .cube-chan { width: 58px; }
+
+  .speech-bubble { font-size: 0.9em; padding: 6px 10px; }
+  .rainbow-arch { width: 180px; height: 90px; border-width: 12px; }
+}
+
+/* iPad横向き */
+@media (min-width: 768px) and (orientation: landscape) {
+  .animation-stage {
+    height: 350px;
+    max-width: 700px;
+  }
+
+  .animation-title { font-size: 2.5em; }
+  .speech-bubble { font-size: 1.6em; }
+}

@@ -40,6 +40,8 @@ const App = {
     document.getElementById("btn-next").addEventListener("click", () => this.goNextChar());
     document.getElementById("btn-select").addEventListener("click", () => this.showSelectScreen());
     document.getElementById("btn-reward").addEventListener("click", () => this.playReward());
+    document.getElementById("btn-anim-next").addEventListener("click", () => { RewardAnimation.hide(); this.goNextChar(); });
+    document.getElementById("btn-anim-select").addEventListener("click", () => { RewardAnimation.hide(); this.showSelectScreen(); });
     document.getElementById("btn-close-video").addEventListener("click", () => YouTube.stop());
     document.getElementById("btn-limit-ok").addEventListener("click", () => this.showSelectScreen());
 
@@ -80,6 +82,7 @@ const App = {
     document.getElementById("clear-overlay").classList.add("hidden");
     document.getElementById("reward-overlay").classList.add("hidden");
     document.getElementById("limit-overlay").classList.add("hidden");
+    document.getElementById("animation-overlay").classList.add("hidden");
 
     this.renderCharGrid();
     this.updateProgress();
@@ -135,7 +138,7 @@ const App = {
     const progressText = document.getElementById("progress-text");
 
     if (remaining <= 0) {
-      progressText.textContent = "🎬 ごほうび どうがが みられるよ！";
+      progressText.textContent = "🎉 ごほうびが もらえるよ！";
     } else {
       progressText.textContent = `あと ${remaining}もじ で ごほうび！`;
     }
@@ -199,11 +202,26 @@ const App = {
 
     // ごほうび条件を満たしたか
     if (this.sessionClears >= Settings.requiredClears) {
-      // 動画上限チェック
-      if (Settings.canPlayVideo()) {
+      const rewardType = Settings.rewardType;
+
+      if (rewardType === "animation") {
+        // アニメーションのみ: 動画上限不要
         this.showRewardScreen();
+      } else if (rewardType === "youtube") {
+        // YouTube動画のみ: 動画上限チェック
+        if (Settings.canPlayVideo()) {
+          this.showRewardScreen();
+        } else {
+          this.showLimitScreen();
+        }
       } else {
-        this.showLimitScreen();
+        // "both": 動画上限チェックするが、アニメーションが選ばれる可能性もある
+        if (Settings.canPlayVideo()) {
+          this.showRewardScreen();
+        } else {
+          // 動画上限に達していてもアニメーションは再生可能
+          this.playAnimation();
+        }
       }
     } else {
       this.showClearOverlay();
@@ -223,9 +241,33 @@ const App = {
   showRewardScreen() {
     this.screen = "reward";
     document.getElementById("clear-overlay").classList.add("hidden");
-    document.getElementById("reward-overlay").classList.remove("hidden");
-    // 豪華な紙吹雪
-    this.showConfetti(60);
+
+    const rewardType = Settings.rewardType;
+
+    if (rewardType === "animation") {
+      // アニメーションのみ
+      this.playAnimation();
+    } else if (rewardType === "youtube") {
+      // YouTube動画のみ
+      document.getElementById("reward-overlay").classList.remove("hidden");
+      this.showConfetti(60);
+    } else {
+      // "both": 50%の確率でどちらか
+      if (Math.random() < 0.5) {
+        this.playAnimation();
+      } else {
+        document.getElementById("reward-overlay").classList.remove("hidden");
+        this.showConfetti(60);
+      }
+    }
+  },
+
+  playAnimation() {
+    this.sessionClears = 0;
+    document.getElementById("tracing-screen").classList.add("hidden");
+    RewardAnimation.play(() => {
+      // アニメーション終了時のコールバック（ボタンで制御するので空）
+    });
   },
 
   showLimitScreen() {
@@ -374,6 +416,8 @@ const SettingsUI = {
 
   // --- 設定画面 ---
   showSettings() {
+    this.renderChildName();
+    this.renderRewardType();
     this.renderRowCheckboxes();
     this.renderSelects();
     this.renderVideoList();
@@ -432,6 +476,16 @@ const SettingsUI = {
     document.getElementById("btn-close-test-video").removeEventListener("click", this._settingsHandlers.closeTest);
     document.getElementById("btn-reset-progress").removeEventListener("click", this._settingsHandlers.reset);
     this._settingsHandlers = null;
+  },
+
+  // --- おこさまの名前 ---
+  renderChildName() {
+    document.getElementById("child-name").value = Settings.childName;
+  },
+
+  // --- ごほうびの種類 ---
+  renderRewardType() {
+    document.getElementById("reward-type").value = Settings.rewardType;
   },
 
   // --- 行チェックボックス ---
@@ -703,6 +757,13 @@ const SettingsUI = {
     checkboxes.forEach((cb) => {
       Settings.enabledRows[cb.dataset.rowId] = cb.checked;
     });
+
+    // おこさまの名前
+    const childName = document.getElementById("child-name").value.trim();
+    Settings.childName = childName || "さくやくん";
+
+    // ごほうびの種類
+    Settings.rewardType = document.getElementById("reward-type").value;
 
     // クリア条件
     Settings.requiredClears = parseInt(document.getElementById("required-clears").value, 10);

@@ -41,6 +41,12 @@ const Settings = {
   todayVideoCount: 0,
   lastPlayDate: "",
 
+  // おこさまの名前（吹き出し表示用）
+  childName: "さくやくん",
+
+  // ごほうびの種類 ("animation" | "youtube" | "both")
+  rewardType: "both",
+
   // ごほうび動画リスト
   videoList: [
     { id: "ptNx7MUtOJQ", title: "サンプル動画" },
@@ -79,6 +85,8 @@ const Settings = {
       if (Array.isArray(data.videoList) && data.videoList.length > 0) {
         this.videoList = data.videoList;
       }
+      if (data.childName) this.childName = data.childName;
+      if (data.rewardType) this.rewardType = data.rewardType;
     } catch (e) {
       console.warn("設定の読み込みに失敗:", e);
     }
@@ -94,6 +102,8 @@ const Settings = {
       todayVideoCount: this.todayVideoCount,
       lastPlayDate: this.lastPlayDate,
       videoList: this.videoList,
+      childName: this.childName,
+      rewardType: this.rewardType,
     };
     localStorage.setItem(this.STORAGE_KEY, JSON.stringify(data));
   },
